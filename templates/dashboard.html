@@ -3,283 +3,188 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FinanceFlow | Dashboard</title>
+    <title>FinanceFlow | Professional Banking</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+
     <style>
       :root {
-        --sidebar-bg: #111827; /* Deeper midnight blue */
-        --main-bg: #f9fafb;
-        --accent: #4361ee;
-        --text-main: #111827;
-        --text-muted: #6b7280;
+        --sidebar-width: 280px;
+        --sidebar-collapsed-width: 85px;
+        --primary-accent: #0062ff; /* Deep Fintech Blue */
+        --bank-dark: #0a0e17; /* High-contrast Navy */
+        --bg-soft: #f4f7fa;
+        --glass: rgba(255, 255, 255, 0.8);
       }
 
       body {
-        background-color: var(--main-bg);
         font-family: "Plus Jakarta Sans", sans-serif;
-        color: var(--text-main);
-        letter-spacing: -0.01em;
+        background: radial-gradient(circle at top right, #f8f9ff, #e9ecf5);
+        color: #1e293b;
         overflow-x: hidden;
       }
 
-      /* Sidebar Refinement */
+      /* Sidebar: Elite Dark Mode */
       #sidebar {
-        width: 280px;
+        width: var(--sidebar-width);
         height: 100vh;
-        background: var(--sidebar-bg);
         position: fixed;
-        color: white;
-        padding: 2rem 1rem;
-        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+        background: var(--bank-dark);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 1050;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
       }
+
+      #sidebar.collapsed {
+        width: var(--sidebar-collapsed-width);
+      }
+      #sidebar.collapsed .nav-text,
+      #sidebar.collapsed .logo-text {
+        display: none;
+      }
+
+      /* Main Wrapper with extra padding for 'Breathing Room' */
+      #main-wrapper {
+        margin-left: var(--sidebar-width);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        min-height: 100vh;
+      }
+      #main-wrapper.expanded {
+        margin-left: var(--sidebar-collapsed-width);
+      }
+
+      /* The Glass Card: This is the secret to the modern look */
+      .glass-card {
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 28px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s ease;
+      }
+
+      .glass-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.06);
+      }
+
+      /* Premium Navigation Pill */
       .nav-link {
-        color: #9ca3af;
-        padding: 14px 20px;
-        border-radius: 12px;
+        color: #94a3b8;
+        padding: 14px 24px;
+        margin: 10px 18px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
-        transition: all 0.2s ease;
-        margin-bottom: 5px;
-      }
-      .nav-link:hover,
-      .nav-link.active {
-        color: white;
-        background: rgba(255, 255, 255, 0.08);
+        font-weight: 500;
       }
       .nav-link.active {
-        background: var(--accent);
+        background: var(--primary-accent);
         color: white;
-      }
-      .nav-link i {
-        margin-right: 15px;
-        width: 20px;
-        font-size: 1.1rem;
+        box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
       }
 
-      /* Content Area */
-      #content {
-        margin-left: 280px;
-        padding: 40px;
-        width: calc(100% - 280px);
-      }
-
-      /* High-Class Modern Cards */
-      .card {
-        border: 1px solid #e5e7eb;
-        border-radius: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
-        background: #ffffff;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-      }
-
-      /* Soft Icon Backgrounds */
-      .icon-box {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        margin-bottom: 1.25rem;
-      }
-
-      .stat-title {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        margin-bottom: 0.5rem;
-      }
-      .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text-main);
-      }
-
-      .table thead th {
-        background-color: #f9fafb;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        padding: 1rem;
-        border: none;
-      }
-      .table td {
-        padding: 1.25rem 1rem;
-        border-bottom: 1px solid #f3f4f6;
+      .top-nav {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.2rem 3rem;
       }
     </style>
   </head>
   <body>
     <nav id="sidebar">
-      <div class="px-3 mb-5">
-        <h4 class="fw-bold"><i class="fas fa-bolt text-primary me-2"></i>FinanceFlow</h4>
+      <div class="p-4 d-flex align-items-center justify-content-between mb-4">
+        <h4 class="text-white fw-bold mb-0 logo-text">Finance<span style="color: var(--primary-accent)">Flow</span></h4>
+        <button class="btn btn-link text-white p-0" onclick="toggleSidebar()"><i class="bi bi-text-indent-left fs-4"></i></button>
       </div>
-      <a href="#" class="nav-link active"><i class="fas fa-grid-2"></i> Overview</a>
-      <a href="#" class="nav-link"><i class="fas fa-exchange-alt"></i> Transactions</a>
-      <a href="#" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
-      <a href="#" class="nav-link"><i class="fas fa-user-shield"></i> Biometrics</a>
-
-      <div class="mt-auto pt-5">
-        <button class="btn btn-primary w-100 rounded-pill py-2 shadow" data-bs-toggle="modal" data-bs-target="#expenseModal"><i class="fas fa-plus-circle me-2"></i> Add Bill</button>
+      <div class="nav flex-column">
+        <a href="#" class="nav-link active"><i class="bi bi-house-door fs-5 me-3"></i><span class="nav-text">Overview</span></a>
+        <a href="#" class="nav-link"><i class="bi bi-wallet2 fs-5 me-3"></i><span class="nav-text">Accounts</span></a>
+        <a href="#" class="nav-link"><i class="bi bi-pie-chart fs-5 me-3"></i><span class="nav-text">Analytics</span></a>
+        <a href="#" class="nav-link"><i class="bi bi-fingerprint fs-5 me-3"></i><span class="nav-text">Security</span></a>
       </div>
     </nav>
 
-    <main id="content">
-      <header class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-          <h2 class="fw-bold mb-1">Financial Pulse</h2>
-          <p class="text-muted small mb-0">Review your spending and budget allocation</p>
-        </div>
-        <div class="d-flex align-items-center bg-white p-2 rounded-pill shadow-sm px-3 border">
-          <span class="small fw-bold me-3 text-muted"><i class="far fa-calendar-alt me-2"></i>Jan 02, 2026</span>
-          <div class="vr me-3" style="height: 20px"></div>
-          <i class="fas fa-user-circle fs-4 text-primary"></i>
+    <div id="main-wrapper">
+      <header class="top-nav d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0">Financial Pulse</h5>
+        <div class="d-flex align-items-center gap-3">
+          <div class="text-end d-none d-md-block">
+            <small class="text-muted d-block">Friday</small>
+            <span class="fw-bold small">Jan 02, 2026</span>
+          </div>
+          <div class="vr mx-2"></div>
+          <img src="https://ui-avatars.com/api/?name=User&background=4361ee&color=fff" class="rounded-circle" width="42" />
         </div>
       </header>
 
-      <div class="row g-4 mb-5">
-        <div class="col-md-3">
-          <div class="card p-4">
-            <div class="d-flex justify-content-between">
-              <div class="icon-box" style="background: rgba(67, 97, 238, 0.1); color: #4361ee">
-                <i class="fas fa-piggy-bank"></i>
-              </div>
-              <button class="btn btn-link text-muted p-0" onclick="setBalance()"><i class="fas fa-pen-to-square small"></i></button>
-            </div>
-            <p class="stat-title">Initial Balance</p>
-            <h3 class="stat-value" id="initialBalanceDisplay">UGX 0</h3>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card p-4">
-            <div class="icon-box" style="background: rgba(239, 71, 111, 0.1); color: #ef476f">
-              <i class="fas fa-arrow-trend-up"></i>
-            </div>
-            <p class="stat-title">Total Spent</p>
-            <h3 class="stat-value text-danger">UGX {{ "{:,.0f}".format(expenses|sum(attribute='amount')) }}</h3>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card p-4 shadow-sm" id="availableCard">
-            <div class="icon-box" style="background: rgba(6, 214, 160, 0.1); color: #06d6a0">
-              <i class="fas fa-coins"></i>
-            </div>
-            <p class="stat-title">Available</p>
-            <h3 class="stat-value" id="remainingDisplay">UGX 0</h3>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card p-4">
-            <div class="icon-box" style="background: rgba(255, 209, 102, 0.1); color: #ffd166">
-              <i class="fas fa-receipt"></i>
-            </div>
-            <p class="stat-title">Active Bills</p>
-            <h3 class="stat-value">{{ expenses|length }}</h3>
-          </div>
-        </div>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-lg-8">
-          <div class="card p-4 border-0 shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h5 class="fw-bold mb-0">Transaction History</h5>
-              <button class="btn btn-light btn-sm rounded-pill px-3">Export <i class="fas fa-download ms-1"></i></button>
-            </div>
-            <div class="table-responsive">
-              <table class="table table-hover align-middle">
-                <thead>
-                  <tr>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for expense in expenses %}
-                  <tr>
-                    <td><span class="fw-bold text-dark">{{ expense.title }}</span></td>
-                    <td><span class="badge rounded-pill bg-light text-primary border px-3 py-2 fw-medium">{{ expense.category }}</span></td>
-                    <td class="text-muted small">{{ expense.date_to_handle.strftime('%b %d, %H:%M') }}</td>
-                    <td class="fw-bold text-danger">- UGX {{ "{:,.0f}".format(expense.amount) }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4">
-          <div class="card p-4 border-0 shadow-sm text-center">
-            <h5 class="fw-bold mb-4">Spending Split</h5>
-            <div class="py-3">
-              <canvas id="categoryChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px">
-          <div class="modal-header border-0 pt-4 px-4">
-            <h5 class="modal-title fw-bold">Add Transaction</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body p-4">
-            <form id="expenseForm">
-              <div class="mb-3">
-                <label class="form-label small fw-bold text-muted">TITLE</label>
-                <input type="text" class="form-control border-0 bg-light py-3" id="title" placeholder="What is this for?" required />
-              </div>
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label small fw-bold text-muted">AMOUNT (UGX)</label>
-                  <input type="number" class="form-control border-0 bg-light py-3" id="amount" placeholder="0" required />
+      <main class="p-4">
+        <div class="row g-4 mb-5">
+          <div class="col-xl-4 col-md-6">
+            <div class="card glass-card p-4">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <p class="text-muted small fw-bold mb-2 uppercase">TOTAL BALANCE</p>
+                  <h2 class="fw-bold mb-0">UGX 2,000,000</h2>
                 </div>
-                <div class="col-md-6 mb-3">
-                  <label class="form-label small fw-bold text-muted">CATEGORY</label>
-                  <select class="form-select border-0 bg-light py-3" id="category">
-                    <option value="Housing">Housing</option>
-                    <option value="Food">Food</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Savings">Savings</option>
-                  </select>
-                </div>
+                <div class="icon-circle bg-primary-subtle text-primary"><i class="bi bi-cash-stack fs-4"></i></div>
               </div>
-              <div class="mb-3">
-                <label class="form-label small fw-bold text-muted">SCHEDULE DATE</label>
-                <input type="datetime-local" class="form-control border-0 bg-light py-3" id="expenseDate" required />
-              </div>
-            </form>
+            </div>
           </div>
-          <div class="modal-footer border-0 pb-4 px-4">
-            <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary rounded-pill px-4 shadow" onclick="saveExpense()">Add Expense</button>
+          <div class="col-xl-4 col-md-6">
+            <div class="card glass-card p-4">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <p class="text-muted small fw-bold mb-2 uppercase">TOTAL SPENT</p>
+                  <h2 class="fw-bold text-danger mb-0">UGX 0</h2>
+                </div>
+                <div class="icon-circle bg-danger-subtle text-danger"><i class="bi bi-cart-dash fs-4"></i></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4 col-md-12">
+            <div class="card glass-card p-4">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <p class="text-muted small fw-bold mb-2 uppercase">SAVINGS GOAL</p>
+                  <h2 class="fw-bold text-success mb-0">85%</h2>
+                </div>
+                <div class="icon-circle bg-success-subtle text-success"><i class="bi bi-trophy fs-4"></i></div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="fw-bold mb-0">Recent Activity</h5>
+          <button class="btn btn-primary px-4 py-2 rounded-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#expenseModal"><i class="bi bi-plus-lg me-2"></i>Record Expense</button>
+        </div>
+
+        <div class="card glass-card overflow-hidden">
+          <table class="table mb-0 table-hover align-middle">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4 border-0 py-3 text-muted small">DESCRIPTION</th>
+                <th class="border-0 py-3 text-muted small">CATEGORY</th>
+                <th class="border-0 py-3 text-muted small text-center">STATUS</th>
+                <th class="pe-4 border-0 py-3 text-muted small text-end">AMOUNT</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+        document.getElementById("main-wrapper").classList.toggle("expanded");
+      }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   </body>
 </html>
