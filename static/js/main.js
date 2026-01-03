@@ -1,90 +1,60 @@
-document.addEventListener("DOMContentLoaded", () => updateFinancials());
+// Wait for the DOM to fully load
+// This prevents the script from failing to work or execute as expected
 
-function saveExpense() {
-  const expenseData = {
-    title: document.getElementById("title").value,
-    amount: document.getElementById("amount").value,
-    category: document.getElementById("category").value,
-    date: document.getElementById("expenseDate").value,
+document.addEventListener("DOMContentLoaded", () => {
+  const expenseForm = document.getElementById("expenseForm");
+  const sidebar = document.getElementById("sidebar");
+  const mainContent = document.getElementById("main-content");
+
+  // 1. PERSIST SIDEBAR STATE
+  const isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
+  if (isCollapsed) {
+    sidebar.classList.add("collapsed");
+    mainContent.classList.add("expanded");
+  }
+
+  // Toggle function for the button
+  window.toggleSidebar = () => {
+    const collapsed = sidebar.classList.toggle("collapsed");
+    mainContent.classList.toggle("expanded");
+    localStorage.setItem("sidebarCollapsed", collapsed);
   };
 
-  if (!expenseData.title || !expenseData.amount || !expenseData.date) {
-    alert("Please fill in all fields!");
-    return;
-  }
+  // 2. ASYNCHRONOUS EXPENSE ADDITION
+  if (expenseForm) {
+    expenseForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-  fetch("/add_expense", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(expenseData),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      alert("Success: " + data.message);
-      location.reload();
+      const formData = {
+        title: document.getElementById("title").value,
+        amount: parseFloat(document.getElementById("amount").value),
+        category: document.getElementById("category").value,
+        date: document.getElementById("date").value,
+      };
+
+      try {
+        const response = await fetch("/add_expense", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          // Hide the modal using Bootstrap's API
+          const modal = bootstrap.Modal.getInstance(document.getElementById("expenseModal"));
+          modal.hide();
+
+          // Reset form
+          expenseForm.reset();
+
+          // TRICK: Reload only the table or update the numbers manually
+          // For now, we'll refresh to ensure the DB syncs,
+          // but we could use JS to append the row for a 'banking' feel.
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error("Transaction failed:", error);
+      }
     });
-}
-
-function updateFinancials() {
-  const initialBalance = parseFloat(localStorage.getItem("userBalance") || 0);
-  document.getElementById("initialBalanceDisplay").innerText = "UGX " + initialBalance.toLocaleString();
-
-  let totalSpent = 0;
-  const categoryTotals = { Housing: 0, Food: 0, Transport: 0, Savings: 0 };
-  const rows = document.querySelectorAll("tbody tr");
-
-  rows.forEach((row) => {
-    const categoryCell = row.cells[1];
-    const amountCell = row.cells[3]; // Amount is now the 4th column
-
-    if (amountCell && !amountCell.innerText.includes("No expenses")) {
-      const amount = parseFloat(amountCell.innerText.replace(/[^\d.]/g, ""));
-      totalSpent += amount;
-      const cat = categoryCell.innerText.trim();
-      if (categoryTotals.hasOwnProperty(cat)) categoryTotals[cat] += amount;
-    }
-  });
-
-  const remaining = initialBalance - totalSpent;
-  const remainingDisplay = document.getElementById("remainingDisplay");
-  remainingDisplay.innerText = "UGX " + remaining.toLocaleString();
-
-  // Toggle color if overspent
-  const card = remainingDisplay.closest(".card");
-  if (remaining < 0) {
-    card.classList.add("bg-danger", "text-white");
-    card.classList.remove("glass-card");
-  } else {
-    card.classList.remove("bg-danger", "text-white");
-    card.classList.add("glass-card");
   }
-
-  renderChart(categoryTotals);
-}
-
-function renderChart(dataValues) {
-  const ctx = document.getElementById("categoryChart").getContext("2d");
-  if (window.myPieChart) window.myPieChart.destroy();
-  window.myPieChart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: Object.keys(dataValues),
-      datasets: [
-        {
-          data: Object.values(dataValues),
-          backgroundColor: ["#4361ee", "#ef476f", "#06d6a0", "#ffd166"],
-          borderWidth: 0,
-        },
-      ],
-    },
-    options: { plugins: { legend: { position: "bottom" } }, cutout: "80%" },
-  });
-}
-
-function setBalance() {
-  const val = prompt("Enter initial balance:", "2000000");
-  if (val) {
-    localStorage.setItem("userBalance", val);
-    updateFinancials();
-  }
-}
+});

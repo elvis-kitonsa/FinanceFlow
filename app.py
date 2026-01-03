@@ -52,14 +52,32 @@ def add_expense():
         print(f"Error: {e}")
         return jsonify({"message": "Internal Server Error"}), 500
 
+# 
+from werkzeug.security import generate_password_hash
+from datetime import date
+
 # Initialize the database and create admin user if not exists
 with app.app_context():
     db.create_all()
+
     # Create admin user if memory is empty
-    if not User.query.get(1):
-        db.session.add(User(username="admin", password_hash="123"))
+    # Updated to match your new model fields
+    if not User.query.filter_by(email="admin@financeflow.com").first():
+        admin = User(
+            email="admin@financeflow.com",
+            password_hash=generate_password_hash("admin123"),
+            full_name="Admin User",
+            phone="000000000",
+            dob=date(1990, 1, 1),
+            home_address="System",
+            national_id="ADMIN-001",
+            terms_agreed=True,
+            privacy_consent=True,
+            data_accuracy_declaration=True
+        )
+        db.session.add(admin)
         db.session.commit()
-        print("Database initialized successfully!")
+        print("Database initialized and Admin created!")
 
 if __name__ == '__main__':
     app.run(debug=True)
