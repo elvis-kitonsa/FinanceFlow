@@ -404,11 +404,22 @@
 
               <div class="mb-3">
                 <label class="form-label small fw-bold text-muted">CATEGORY</label>
-                <select class="form-select border-0 bg-light rounded-3" id="expense-category">
-                  <option value="Food">Food</option>
-                  <option value="Transport">Transport</option>
-                  <option value="Bills">Bills</option>
-                  <option value="Savings">Savings (Move to Saved Card)</option>
+                <select class="form-select border-0 bg-light rounded-3 shadow-sm" id="expense-category">
+                  <optgroup label="Essential">
+                    <option value="Food">🍎 Food & Dining</option>
+                    <option value="Transport">🚗 Transport & Fuel</option>
+                    <option value="Bills">🔌 Utilities & Bills</option>
+                    <option value="Rent">🏠 Rent/Mortgage</option>
+                  </optgroup>
+                  <optgroup label="Lifestyle">
+                    <option value="Shopping">🛍️ Shopping</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Health">💊 Health & Medical</option>
+                  </optgroup>
+                  <optgroup label="Financial">
+                    <option value="Savings">💰 Savings (Move to Saved Card)</option>
+                    <option value="Investment">📈 Investment</option>
+                  </optgroup>
                 </select>
               </div>
 
