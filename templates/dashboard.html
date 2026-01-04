@@ -236,7 +236,32 @@
                 <th class="pe-4 border-0 py-3 text-muted small text-end">AMOUNT</th>
               </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+              {% for expense in expenses %}
+              <tr>
+                <td class="ps-4 py-3">
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">{{ expense.description }}</span>
+                    <small class="text-muted" style="font-size: 0.65rem"> {{ expense.date_to_handle.strftime('%d %b, %H:%M') }} </small>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge rounded-pill {% if expense.category == 'Savings' %}bg-primary{% else %}bg-light text-dark{% endif %} px-3"> {{ expense.category }} </span>
+                </td>
+                <td class="text-center">
+                  <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Completed</span>
+                </td>
+                <td class="pe-4 text-end fw-bold {% if expense.category == 'Savings' %}text-primary{% else %}text-danger{% endif %}">{% if expense.category != 'Savings' %}-{% endif %} {{ "{:,.0f}".format(expense.amount) }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                  No transactions recorded yet.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
           </table>
         </div>
       </main>
