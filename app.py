@@ -79,5 +79,15 @@ with app.app_context():
         db.session.commit()
         print("Database initialized and Admin created!")
 
+@app.route('/update_balance', methods=['POST'])
+def update_balance():
+    data = request.get_json()
+    user = User.query.get(1) # Using your admin user ID
+    if user:
+        user.total_balance = float(data['balance'])
+        db.session.commit()
+        return jsonify({"status": "success", "new_balance": user.total_balance})
+    return jsonify({"status": "error"}), 404
+
 if __name__ == '__main__':
     app.run(debug=True)

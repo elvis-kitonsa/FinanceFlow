@@ -44,7 +44,8 @@ class User(UserMixin, db.Model):
     is_biometric_enabled = db.Column(db.Boolean, default=False)
     base_currency = db.Column(db.String(3), default='UGX')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    total_balance = db.Column(db.Float, default=0.0)
+    
     # Relationships: Ensures expenses and budgets belong to this user
     # These relationships link the User model to Expense and Budget models
     expenses = db.relationship('Expense', backref='owner', lazy=True)
