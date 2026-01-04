@@ -9,112 +9,129 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
 
     <style>
-        :root {
-          --sidebar-width: 280px;
-          --sidebar-collapsed-width: 85px;
-          --primary-accent: #0062ff; /* Deep Fintech Blue */
-          --bank-dark: #0a0e17; /* High-contrast Navy */
-          --bg-soft: #f4f7fa;
-          --glass: rgba(255, 255, 255, 0.8);
-        }
+      :root {
+        --sidebar-width: 280px;
+        --sidebar-collapsed-width: 85px;
+        --primary-accent: #0062ff; /* Deep Fintech Blue */
+        --bank-dark: #0a0e17; /* High-contrast Navy */
+        --bg-soft: #f4f7fa;
+        --glass: rgba(255, 255, 255, 0.8);
+      }
 
-        body {
-          font-family: "Plus Jakarta Sans", sans-serif;
-          background: radial-gradient(circle at top right, #f8f9ff, #e9ecf5);
-          color: #1e293b;
-          overflow-x: hidden;
-        }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: radial-gradient(circle at top right, #f8f9ff, #e9ecf5);
+        color: #1e293b;
+        overflow-x: hidden;
+      }
 
-        /* Sidebar: Elite Dark Mode */
-        #sidebar {
-          width: var(--sidebar-width);
-          height: 100vh;
-          position: fixed;
-          background: var(--bank-dark);
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          z-index: 1050;
-          border-right: 1px solid rgba(255, 255, 255, 0.05);
-        }
+      /* Sidebar: Elite Dark Mode */
+      #sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        background: var(--bank-dark);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 1050;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+      }
 
-        #sidebar.collapsed {
-          width: var(--sidebar-collapsed-width);
-        }
-        #sidebar.collapsed .nav-text,
-        #sidebar.collapsed .logo-text {
-          display: none;
-        }
+      #sidebar.collapsed {
+        width: var(--sidebar-collapsed-width);
+      }
+      #sidebar.collapsed .nav-text,
+      #sidebar.collapsed .logo-text {
+        display: none;
+      }
 
-        /* Main Wrapper with extra padding for 'Breathing Room' */
-        #main-wrapper {
-          margin-left: var(--sidebar-width);
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          min-height: 100vh;
-        }
-        #main-wrapper.expanded {
-          margin-left: var(--sidebar-collapsed-width);
-        }
+      /* Main Wrapper */
+      #main-wrapper {
+        margin-left: var(--sidebar-width);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        min-height: 100vh;
+      }
+      #main-wrapper.expanded {
+        margin-left: var(--sidebar-collapsed-width);
+      }
 
-        /* The Glass Card: This is the secret to the modern look */
-        .glass-card {
-          background: #ffffff;
-          border-radius: 24px; /* Slightly more rounded for that modern feel */
-          border: 1px solid rgba(255, 255, 255, 0.8); /* Subtle border for definition */
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.02);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+      /* Enhanced Glassmorphism Card with Alignment Fixes */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 145px; /* Ensures all cards match height */
+      }
 
-        .glass-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        }
+      .glass-card:hover {
+        transform: translateY(-8px);
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
 
-        /* Premium Navigation Pill */
-        .nav-link {
-          color: #94a3b8;
-          padding: 14px 24px;
-          margin: 10px 18px;
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          font-weight: 500;
-          transition: all 0.3s ease;
-        }
-        .nav-link.active {
-          background: var(--primary-accent);
-          color: white;
-          box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
-        }
+      .card-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 8px;
+      }
 
-        .top-nav {
-          background: rgba(255, 255, 255, 0.6);
-          backdrop-filter: blur(10px);
-          border-bottom: 1px solid #e2e8f0;
-          padding: 1.2rem 3rem;
+      .nav-link {
+        color: #94a3b8;
+        padding: 14px 24px;
+        margin: 10px 18px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      .nav-link.active {
+        background: var(--primary-accent);
+        color: white;
+        box-shadow: 0 8px 20px rgba(0, 98, 255, 0.3);
+      }
 
-          /* Refined Typography */
-      h2, .balance-text {
-          letter-spacing: -0.03em;
-          font-weight: 700;
-          color: #0f172a;
+      .top-nav {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.2rem 3rem;
+      }
+
+      h2,
+      .balance-text {
+        letter-spacing: -0.03em;
+        font-weight: 700;
+        color: #0f172a;
       }
 
       .text-muted {
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
       }
 
-      /* Icon Pop Effect */
       .icon-box {
-          width: 45px;
-          height: 45px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f8fafc;
-          color: var(--primary-accent);
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
       }
     </style>
   </head>
@@ -146,37 +163,59 @@
       </header>
 
       <main class="p-4">
-        <div class="row g-4 mb-5">
-          <div class="col-xl-4 col-md-6">
-            <div class="card glass-card p-4">
-              <div class="d-flex justify-content-between align-items-start">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-5">
+          <div class="col">
+            <div class="card glass-card h-100 p-4">
+              <div class="d-flex justify-content-between">
                 <div>
-                  <p class="text-muted small fw-bold mb-2 uppercase">TOTAL BALANCE</p>
-                  <h2 class="fw-bold mb-0">UGX 2,000,000</h2>
+                  <p class="card-label">Total Balance</p>
+                  <h3 class="balance-text mb-0">UGX 2,000,000</h3>
                 </div>
-                <div class="icon-circle bg-primary-subtle text-primary"><i class="bi bi-cash-stack fs-4"></i></div>
+                <div class="icon-box shadow-sm" style="background: rgba(0, 98, 255, 0.1); color: #0062ff">
+                  <i class="bi bi-wallet2"></i>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-xl-4 col-md-6">
-            <div class="card glass-card p-4">
-              <div class="d-flex justify-content-between align-items-start">
+
+          <div class="col">
+            <div class="card glass-card h-100 p-4">
+              <div class="d-flex justify-content-between">
                 <div>
-                  <p class="text-muted small fw-bold mb-2 uppercase">TOTAL SPENT</p>
-                  <h2 class="fw-bold text-danger mb-0">UGX 0</h2>
+                  <p class="card-label">Total Spent</p>
+                  <h3 class="balance-text text-danger mb-0">UGX 555,172</h3>
                 </div>
-                <div class="icon-circle bg-danger-subtle text-danger"><i class="bi bi-cart-dash fs-4"></i></div>
+                <div class="icon-box shadow-sm" style="background: rgba(239, 68, 68, 0.1); color: #ef4444">
+                  <i class="bi bi-cart-dash"></i>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-xl-4 col-md-12">
-            <div class="card glass-card p-4">
-              <div class="d-flex justify-content-between align-items-start">
+
+          <div class="col">
+            <div class="card glass-card h-100 p-4">
+              <div class="d-flex justify-content-between">
                 <div>
-                  <p class="text-muted small fw-bold mb-2 uppercase">SAVINGS GOAL</p>
-                  <h2 class="fw-bold text-success mb-0">85%</h2>
+                  <p class="card-label">Total Remaining</p>
+                  <h3 class="balance-text text-success mb-0">UGX 1,444,828</h3>
                 </div>
-                <div class="icon-circle bg-success-subtle text-success"><i class="bi bi-trophy fs-4"></i></div>
+                <div class="icon-box shadow-sm" style="background: rgba(34, 197, 94, 0.1); color: #22c55e">
+                  <i class="bi bi-piggy-bank"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card glass-card h-100 p-4">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="card-label">Amount Saved</p>
+                  <h3 class="balance-text text-primary mb-0">UGX 200,000</h3>
+                </div>
+                <div class="icon-box shadow-sm" style="background: rgba(67, 97, 238, 0.1); color: #4361ee">
+                  <i class="bi bi-safe"></i>
+                </div>
               </div>
             </div>
           </div>
@@ -187,7 +226,7 @@
           <button class="btn btn-primary px-4 py-2 rounded-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#expenseModal"><i class="bi bi-plus-lg me-2"></i>Record Expense</button>
         </div>
 
-        <div class="card glass-card overflow-hidden">
+        <div class="card glass-card overflow-hidden" style="min-height: auto">
           <table class="table mb-0 table-hover align-middle">
             <thead class="bg-light">
               <tr>
