@@ -132,3 +132,37 @@ function saveNewBalance() {
     })
     .catch((error) => console.error("Error updating balance:", error));
 }
+
+function showExpenseDetails(description, category, amount, status, dateTime) {
+  // Fill the modal with data
+  document.getElementById("modalDescription").innerText = description;
+  document.getElementById("modalCategory").innerText = category;
+  document.getElementById("modalAmount").innerText = amount;
+  document.getElementById("modalDateTime").innerText = dateTime;
+
+  // Show the modal
+  var myModal = new bootstrap.Modal(document.getElementById("expenseDetailModal"));
+  myModal.show();
+}
+
+function handleRowClick(row) {
+  // 1. Extract data
+  const title = row.getAttribute("data-title");
+  const category = row.getAttribute("data-category");
+  const amount = row.getAttribute("data-amount");
+  const date = row.getAttribute("data-date");
+
+  // 2. Format amount
+  const formattedAmount = "UGX " + Number(amount).toLocaleString();
+
+  // 3. Update Modal Text
+  document.getElementById("modalDescription").innerText = title;
+  document.getElementById("modalCategory").innerText = category;
+  document.getElementById("modalAmount").innerText = formattedAmount;
+  document.getElementById("modalDateTime").innerText = date;
+
+  // 4. Trigger the Modal (Using the Bootstrap 5 static method)
+  const modalElement = document.getElementById("expenseDetailModal");
+  const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+  modalInstance.show();
+}
