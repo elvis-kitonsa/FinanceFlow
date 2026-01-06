@@ -151,7 +151,7 @@ function handleRowClick(row) {
   const title = row.getAttribute("data-title");
   const category = row.getAttribute("data-category");
   const amount = row.getAttribute("data-amount");
-  const date = row.getAttribute("data-date");
+  const date = row.getAttribute("data-date"); // This now gets "06 Jan, 2026 | 01:06 PM"
 
   // 2. Format amount
   const formattedAmount = "UGX " + Number(amount).toLocaleString();

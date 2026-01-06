@@ -157,7 +157,7 @@
                 data-title="{{ expense.title }}"
                 data-category="{{ expense.category }}"
                 data-amount="{{ expense.amount }}"
-                data-date="{{ expense.date_to_handle.strftime('%d %b, %Y') }}"
+                data-date="{{ expense.date_to_handle.strftime('%d %b, %Y | %I:%M %p') }}"
                 onclick="handleRowClick(this)"
               >
                 <td class="ps-4 py-3">
