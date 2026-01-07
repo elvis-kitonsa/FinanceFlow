@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from extensions import db 
 from datetime import datetime, date
-from werkzeug.security import generate_password_hash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
+# Initialize the application first
 app = Flask(__name__)
 
 # Basic Configuration
@@ -11,21 +13,83 @@ app.config['SECRET_KEY'] = 'your-very-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///finance.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize the database
+# Initialize the database / Extensions second
 db.init_app(app)
+
+# Initialize Login Manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login' # Redirects here if login is required
 
 # Import models AFTER db is defined to avoid circular imports
 from models import User, Expense, Budget
 
-# --- ROUTES ---
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# --- AUTHENTICATION ROUTES ---
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        password = request.form.get('password')
+        
+        if User.query.filter((User.email == email) | (User.phone == phone)).first():
+            flash('Email or Phone already registered!', 'danger')
+            return redirect(url_for('register'))
+
+        new_user = User(
+            email=email,
+            phone=phone,
+            full_name=request.form.get('full_name'),
+            password_hash=generate_password_hash(password),
+            dob=datetime.strptime(request.form.get('dob'), '%Y-%m-%d').date(),
+            home_address=request.form.get('home_address'),
+            national_id=request.form.get('national_id'),
+            terms_agreed=True,
+            total_balance=0.0
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created! Please login.', 'success')
+        return redirect(url_for('login'))
+        
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        identifier = request.form.get('identifier')
+        password = request.form.get('password')
+        
+        user = User.query.filter((User.email == identifier) | (User.phone == identifier)).first()
+        
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        
+        flash('Invalid credentials', 'danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# --- MAIN DASHBOARD ROUTES (Multi-user) ---
 
 @app.route('/')
+@login_required # Dashboard now requires login
 def dashboard():
-    # Fetch the admin user
-    user = User.query.filter_by(email="admin@financeflow.com").first()
-    all_expenses = Expense.query.order_by(Expense.date_to_handle.desc()).all()
+    # CHANGE: Use current_user.id to filter expenses
+    all_expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date_to_handle.desc()).all()
     
-    total_balance = user.total_balance if user else 0
+    # CHANGE: Use current_user.total_balance
+    total_balance = current_user.total_balance
     
     # 1. Sum of everything that is NOT 'Savings' (Actual Costs)
     total_spent = sum(exp.amount for exp in all_expenses if exp.category != 'Savings')
@@ -44,64 +108,61 @@ def dashboard():
                            amount_saved=amount_saved)
 
 @app.route('/update_balance', methods=['POST'])
+@login_required
 def update_balance():
     data = request.get_json()
-    user = User.query.filter_by(email="admin@financeflow.com").first() 
-    if user:
-        try:
-            # 1. Update the fixed Total Balance
-            user.total_balance = float(data['balance'])
+
+    # CHANGE: Directly update current_user
+    try:
+        # 1. Update the fixed Total Balance
+        current_user.total_balance = float(data['balance'])
             
-            # 2. Check if the "Reset all" toggle was ON
-            if data.get('should_reset'):
-                # This line wipes the list and resets 'Spent' and 'Saved' cards to 0
-                Expense.query.filter_by(user_id=user.id).delete()
+        # 2. Check if the "Reset all" toggle was ON
+        if data.get('should_reset'):
+            # Only delete expenses for THIS user
+            Expense.query.filter_by(user_id=current_user.id).delete()
             
-            db.session.commit()
-            return jsonify({"status": "success", "new_balance": user.total_balance})
-        except Exception as e:
+        db.session.commit()
+        return jsonify({"status": "success", "new_balance": current_user.total_balance})
+    except Exception as e:
             db.session.rollback()
             return jsonify({"status": "error", "message": str(e)}), 500
-            
-    return jsonify({"status": "error"}), 404
 
 @app.route('/add_expense', methods=['POST'])
+@login_required
 def add_expense():
     data = request.get_json()
-    user = User.query.filter_by(email="admin@financeflow.com").first()
-    
-    if user:
-        try:
-            # We use 'description' to match your JavaScript 'expenseData' object
-            new_entry = Expense(
-                title=data['title'],
-                category=data['category'],
-                amount=float(data['amount']),
-                user_id=user.id,
-                # Automatically sets the time to right now
-                date_to_handle=datetime.now() 
-            )
-            db.session.add(new_entry)
-            db.session.commit()
-            return jsonify({"status": "success"})
-        except Exception as e:
-            print(f"Error saving expense: {e}")
-            return jsonify({"status": "error", "message": str(e)}), 500
-            
-    return jsonify({"status": "error", "message": "User not found"}), 404
+    try:
+        # We use 'description' to match your JavaScript 'expenseData' object
+        new_entry = Expense(
+            title=data['title'],
+            category=data['category'],
+            amount=float(data['amount']),
+            user_id=current_user.id, # Link it to the logged-in user
+            date_to_handle=datetime.now() # Automatically sets the time to right now
+        )
+        db.session.add(new_entry)
+        db.session.commit()
+        return jsonify({"status": "success"})
+    except Exception as e:
+        print(f"Error saving expense: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/delete_expense/<int:expense_id>', methods=['DELETE'])
+@login_required # Always ensure user is logged in first
 def delete_expense(expense_id):
     # 1. Find the expense in the database
     expense = Expense.query.get_or_404(expense_id)
 
+    # 2. TINY REFINEMENT: Ownership Check
+    if expense.user_id != current_user.id:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
     try:
-        # 2. Delete the record
+        # 3. Delete the record
         db.session.delete(expense)
         db.session.commit()
-
         return jsonify({"status": "success", "message": "Expense reimbursed and deleted"}), 200
-
     except Exception as e:
         db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -110,6 +171,7 @@ def delete_expense(expense_id):
 # This is the card that pops up when you click on an already registered expense in the dashboard list
 
 @app.route('/update_expense_description/<int:expense_id>', methods=['POST'])
+@login_required
 def update_expense_description(expense_id):
     data = request.get_json()
     new_title = data.get('title')
@@ -117,12 +179,16 @@ def update_expense_description(expense_id):
     # 1. Find the expense in the database
     expense = Expense.query.get_or_404(expense_id)
 
+    # 2. TINY REFINEMENT: Ownership Check
+    if expense.user_id != current_user.id:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+
     if new_title:
-        # 2. Update the title/description field
+        # 3. Update the title/description field
         expense.title = new_title
     
         try:
-            # 3. Save changes
+            # 4. Save changes
             db.session.commit()
             return jsonify({"status": "success", "message": "Description updated"}), 200
         except Exception as e:
