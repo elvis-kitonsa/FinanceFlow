@@ -270,6 +270,9 @@ document.getElementById("expenseDetailModal").addEventListener("hidden.bs.modal"
 
 // 7. BALANCE RESET CONFIRMATION LOGIC
 // Switches between the Input form and the Warning card in the Balance Modal
+// Function called by 2 buttons: the Toggle/Slide button in the Total Balance card and the new Delete
+// All button attached to the dashboard at the end of the List
+
 function toggleResetConfirm(showWarning) {
   const setupView = document.getElementById("balance-setup-view");
   const confirmView = document.getElementById("reset-confirm-view");
