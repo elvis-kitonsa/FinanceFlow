@@ -35,7 +35,7 @@
         </div>
 
         <!--Phone Container - includes a drop down for all the country codes of various countries and a close out button to delete typed text -->
-        <div id="phoneContainer" class="input-group input-group-merge shadow-sm rounded-pill d-none" style="border: 1px solid #20252c; overflow: hidden">
+        <div id="phoneContainer" class="input-group input-group-merge shadow-sm rounded-pill d-none" style="border: 1px solid #20252c">
           <button class="btn btn-white border-0 dropdown-toggle text-dark fw-bold" type="button" data-bs-toggle="dropdown" id="activeCode" style="font-size: 0.9rem">+256</button>
 
           <div style="width: 1px; height: 25px; background-color: #20252c; align-self: center; opacity: 0.5"></div>
@@ -65,6 +65,7 @@
   </div>
 </div>
 
+<!-- Bootstrap CDN: Allows us work with jQ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
@@ -113,11 +114,43 @@
     document.getElementById("country_code_val").value = code;
   }
 
+  // FIXED: Changed 'countryItems' to 'countryList' to match your HTML
+  async function fetchAllCountries() {
+    try {
+      const response = await fetch("https://restcountries.com/v3.1/all?fields=name,idd,flag");
+      const countries = await response.json();
+      const container = document.getElementById("countryList"); // Matches your <ul> ID
+
+      countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+      // Added a Search Input inside the dropdown for the filterCountries function to work
+      let html = `
+        <li class="px-2 pb-2" onclick="event.stopPropagation()">
+          <div class="input-group input-group-sm">
+            <input type="text" id="countrySearch" class="form-control" placeholder="Search country..." onkeyup="filterCountries()">
+            <button class="btn btn-outline-secondary d-none" type="button" id="clearSearch" onclick="clearCountrySearch()">×</button>
+          </div>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+      `;
+
+      countries.forEach((c) => {
+        if (c.idd.root) {
+          const code = c.idd.root + (c.idd.suffixes ? c.idd.suffixes[0] : "");
+          html += `<li><a class="dropdown-item small" href="javascript:void(0)" onclick="setCode('${code}')">${c.flag} ${code} (${c.name.common})</a></li>`;
+        }
+      });
+      container.innerHTML = html;
+    } catch (e) {
+      console.log("Error loading countries.");
+    }
+  }
+
   function filterCountries() {
     const input = document.getElementById("countrySearch"); //Input for country searches
     const clearBtn = document.getElementById("clearSearch"); // Clear button to remove typed names
     const filter = input.value.toLowerCase();
-    const items = document.getElementById("countryItems").getElementsByTagName("li");
+    const items = document.getElementById("countryList").getElementsByTagName("li");
 
     // Show/Hide the 'x' button based on text length
     if (input.value.length > 0) {
@@ -127,6 +160,10 @@
     }
 
     for (let i = 0; i < items.length; i++) {
+      // Skip the search box container and the horizontal divider
+      if (items[i].classList.contains("px-2") || items[i].querySelector(".dropdown-divider")) {
+        continue;
+      }
       const text = items[i].innerText.toLowerCase();
       items[i].style.display = text.includes(filter) ? "" : "none";
     }
@@ -137,29 +174,6 @@
     input.value = ""; // Clear the text
     filterCountries(); // Reset the list and hide the button
     input.focus(); // Keep the cursor in the box
-  }
-
-  // Optional: Run this to populate the list automatically with all countries
-  async function fetchAllCountries() {
-    try {
-      const response = await fetch("https://restcountries.com/v3.1/all?fields=name,idd,flag,cca2");
-      const countries = await response.json();
-      const container = document.getElementById("countryItems");
-
-      // Sort alphabetically
-      countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
-
-      let html = "";
-      countries.forEach((c) => {
-        if (c.idd.root) {
-          const code = c.idd.root + (c.idd.suffixes ? c.idd.suffixes[0] : "");
-          html += `<li><a class="dropdown-item" href="javascript:void(0)" onclick="setCode('${code}')">${c.flag} ${code} (${c.name.common})</a></li>`;
-        }
-      });
-      container.innerHTML = html;
-    } catch (e) {
-      console.log("Error loading countries, keeping defaults.");
-    }
   }
 
   // Call this function when the page loads
