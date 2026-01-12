@@ -26,6 +26,9 @@
       </p>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+    <div class="alert alert-{{ category }} rounded-pill py-2 small text-center mb-3">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
     <form method="POST">
       <div class="mb-3">
         <!-- Login button options: Email or Phone Number -->

@@ -96,29 +96,31 @@ def login():
     db.session.remove()
 
     if request.method == 'POST':
-        # Safety Check: Use .get() and provide a default empty string ''
-        raw_identifier = request.form.get('identifier')
-        # Capture credentials from the form ie. the email/phone and password fields
-        identifier = request.form.get('identifier').strip().lower() if raw_identifier else ""# Clean the input
+        # 1. Get the specific fields from your modern toggle form
+        email_val = request.form.get('email')
+        phone_val = request.form.get('phone')
+        c_code = request.form.get('country_code', '+256') # Get the prefix
         password = request.form.get('password')
         
-        # Find user by email or phone
-        user = User.query.filter((User.email == identifier) | (User.phone == identifier)).first()
+        user = None
 
-        # 3. Security Check: Differentiated feedback for debugging
-        if not user:
-            flash('No account found with that Email or Phone number.', 'danger')
-            return redirect(url_for('login'))
-        
-        # Another Safety Check: Ensure password_hash exists before checking
-        if user.password_hash and check_password_hash(user.password_hash, password):
+        # 2. Logic: Decide which field to query based on what the user filled in
+        if email_val:
+            identifier = email_val.strip().lower()
+            user = User.query.filter_by(email=identifier).first()
+        elif phone_val:
+            # Join the code and number to match the +256... format in the DB
+            identifier = f"{c_code}{phone_val.strip()}"
+            user = User.query.filter_by(phone=identifier).first()
+
+        # 3. Security Check
+        if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            # Before redirecting, ensure we don't crash the dashboard
             flash(f'Welcome back!', 'success')
             return redirect(url_for('dashboard'))
         
-        # Error Handling: Invalid credentials
-        flash('Invalid credentials. Please try again.', 'danger')
+        flash('No account found or invalid credentials.', 'danger')
+        
     return render_template('login.html')
 
 @app.route('/logout')

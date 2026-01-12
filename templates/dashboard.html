@@ -1,387 +1,318 @@
-<!-- This is the main dashboard page for the FMS System -->
-<!-- Extends the base template for consistent layout and styles across the app -->
 {% extends "base.html" %} {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FMS | Manage Your Finances</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edits.css') }}" />
-  </head>
-  <body>
-    <!-- Sidebar Navigation for the FinanceFlow Dashboard -->
-    <!-- Includes links to different sections like Overview, Accounts, Analytics, and Security -->
-    <nav id="sidebar">
-      <div class="p-4 d-flex align-items-center justify-content-between mb-4">
-        <h4 class="text-white fw-bold mb-0 logo-text">F<span style="color: var(--primary-accent)">M</span>S</h4>
-        <button class="btn btn-link text-white p-0" onclick="toggleSidebar()"><i class="bi bi-text-indent-left fs-4"></i></button>
+<nav id="sidebar">
+  <div class="p-4 d-flex align-items-center justify-content-between mb-4">
+    <h4 class="text-white fw-bold mb-0 logo-text">F<span style="color: var(--primary-accent)">M</span>S</h4>
+    <button class="btn btn-link text-white p-0" onclick="toggleSidebar()"><i class="bi bi-text-indent-left fs-4"></i></button>
+  </div>
+  <div class="nav flex-column">
+    <a href="#" class="nav-link active"><i class="bi bi-house-door fs-5 me-3"></i><span class="nav-text">Overview</span></a>
+    <a href="#" class="nav-link"><i class="bi bi-wallet2 fs-5 me-3"></i><span class="nav-text">Accounts</span></a>
+    <a href="#" class="nav-link"><i class="bi bi-pie-chart fs-5 me-3"></i><span class="nav-text">Analytics</span></a>
+    <a href="#" class="nav-link"><i class="bi bi-fingerprint fs-5 me-3"></i><span class="nav-text">Security</span></a>
+  </div>
+</nav>
+
+<div id="main-wrapper">
+  <header class="top-nav d-flex justify-content-between align-items-center">
+    <h5 class="fw-bold mb-0">FinanceFlow | Dashboard</h5>
+    <div class="d-flex align-items-center gap-3">
+      <div class="text-end d-none d-md-block">
+        <small class="text-muted d-block" id="current-day">Loading...</small>
+        <span class="fw-bold small" id="current-date">Loading...</span>
       </div>
-      <div class="nav flex-column">
-        <a href="#" class="nav-link active"><i class="bi bi-house-door fs-5 me-3"></i><span class="nav-text">Overview</span></a>
-        <a href="#" class="nav-link"><i class="bi bi-wallet2 fs-5 me-3"></i><span class="nav-text">Accounts</span></a>
-        <a href="#" class="nav-link"><i class="bi bi-pie-chart fs-5 me-3"></i><span class="nav-text">Analytics</span></a>
-        <a href="#" class="nav-link"><i class="bi bi-fingerprint fs-5 me-3"></i><span class="nav-text">Security</span></a>
+      <div class="vr mx-2"></div>
+
+      <div class="dropdown">
+        <div class="user-avatar dropdown-toggle shadow-sm" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer">
+          <span id="user-initials">{{ current_user.full_name[:2].upper() }}</span>
+        </div>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
+          <div class="dropdown-header-custom">
+            <div class="fw-bold text-dark">{{ current_user.full_name }}</div>
+            <div class="small text-muted">{{ current_user.email }}</div>
+          </div>
+          <li>
+            <a class="dropdown-item" href="#"><i class="bi bi-person"></i> Your Profile</a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#"><i class="bi bi-wallet2"></i> Your Accounts</a>
+          </li>
+          <li><hr class="dropdown-divider" /></li>
+          <li>
+            <a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a>
+          </li>
+          <li>
+            <div class="dropdown-item d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-moon"></i> Dark Mode</span>
+              <div class="form-check form-switch mb-0">
+                <input class="form-check-input" type="checkbox" id="themeSwitch" />
+              </div>
+            </div>
+          </li>
+          <li><hr class="dropdown-divider" /></li>
+          <li>
+            <a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Sign out</a>
+          </li>
+        </ul>
       </div>
-    </nav>
+    </div>
+  </header>
 
-    <!-- Main Wrapper for Dashboard Content -->
-    <!-- Includes top navigation bar, summary cards, and expense table -->
-    <div id="main-wrapper">
-      <header class="top-nav d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold mb-0">FinanceFlow | Dashboard</h5>
-        <div class="d-flex align-items-center gap-3">
-          <div class="text-end d-none d-md-block">
-            <small class="text-muted d-block" id="current-day">Loading...</small>
-            <span class="fw-bold small" id="current-date">Loading...</span>
-          </div>
-          <div class="vr mx-2"></div>
-          <!-- Dropdown Profile Menu -->
-          <!-- Includes options for profile, accounts, settings, dark mode toggle, and sign out -->
-          <div class="dropdown">
-            <div class="user-avatar dropdown-toggle shadow-sm" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer">
-              <!-- Display user's initials in the avatar circle -->
-              <span id="user-initials">{{ current_user.full_name[:2].upper() }}</span>
+  <main class="p-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-5">
+      <div class="col">
+        <div class="card glass-card h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="card-label">Total Balance</p>
+              <h3 class="balance-text mb-0" id="display-total-balance">UGX {{ "{:,.0f}".format(total_balance) }}</h3>
             </div>
-
-            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
-              <div class="dropdown-header-custom">
-                <!-- Show user's full name and email at the top of the dropdown -->
-                <div class="fw-bold text-dark">{{ current_user.full_name }}</div>
-                <div class="small text-muted">{{ current_user.email }}</div>
-              </div>
-
-              <li>
-                <a class="dropdown-item" href="#"><i class="bi bi-person"></i> Your Profile</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#"><i class="bi bi-wallet2"></i> Your Accounts</a>
-              </li>
-
-              <li><hr class="dropdown-divider" /></li>
-
-              <li>
-                <a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a>
-              </li>
-              <li>
-                <div class="dropdown-item d-flex justify-content-between align-items-center">
-                  <span><i class="bi bi-moon"></i> Dark Mode</span>
-                  <div class="form-check form-switch mb-0">
-                    <input class="form-check-input" type="checkbox" id="themeSwitch" />
-                  </div>
-                </div>
-              </li>
-
-              <li><hr class="dropdown-divider" /></li>
-
-              <li>
-                <!-- Logout option to end user session -->
-                <!-- Link to the logout route defined in app.py -->
-                <a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Sign out</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </header>
-
-      <!-- Bootstrap Cards in the FinanceFlow Dashboard-->
-      <main class="p-4">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-5">
-          <div class="col">
-            <div class="card glass-card h-100">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <p class="card-label">Total Balance</p>
-                  <h3 class="balance-text mb-0" id="display-total-balance">UGX {{ "{:,.0f}".format(total_balance) }}</h3>
-                </div>
-                <div class="icon-box shadow-sm clickable-icon" style="background: rgba(0, 98, 255, 0.1); color: #0062ff; cursor: pointer" data-bs-toggle="modal" data-bs-target="#updateBalanceModal" title="Click to adjust balance">
-                  <i class="bi bi-wallet-fill"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col">
-            <div class="card glass-card h-100">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <p class="card-label">Total Amount Spent</p>
-                  <h3 class="balance-text text-danger mb-0">UGX {{ "{:,.0f}".format(total_spent) }}</h3>
-                </div>
-                <div class="icon-box shadow-sm" style="background: rgba(239, 68, 68, 0.1); color: #ef4444">
-                  <i class="bi bi-receipt-cutoff"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col">
-            <div class="card glass-card h-100">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <p class="card-label">Total Amount Remaining</p>
-                  <h3 class="balance-text text-success mb-0">UGX {{ "{:,.0f}".format(total_remaining) }}</h3>
-                </div>
-                <div class="icon-box shadow-sm" style="background: rgba(34, 197, 94, 0.1); color: #22c55e">
-                  <i class="bi bi-cash-stack"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col">
-            <div class="card glass-card h-100">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <p class="card-label">Amount Saved</p>
-                  <h3 class="balance-text text-primary mb-0">UGX {{ "{:,.0f}".format(amount_saved) }}</h3>
-                </div>
-                <div class="icon-box shadow-sm" style="background: rgba(67, 97, 238, 0.1); color: #4361ee">
-                  <i class="bi bi-graph-up-arrow"></i>
-                </div>
-              </div>
+            <div class="icon-box shadow-sm clickable-icon" style="background: rgba(0, 98, 255, 0.1); color: #0062ff; cursor: pointer" data-bs-toggle="modal" data-bs-target="#updateBalanceModal">
+              <i class="bi bi-wallet-fill"></i>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h5 class="fw-bold mb-0">List | Registered Expenses</h5>
-          <button class="btn btn-primary px-4 py-2 rounded-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#expenseModal"><i class="bi bi-plus-lg me-2"></i>Record Expense</button>
+      <div class="col">
+        <div class="card glass-card h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="card-label">Total Amount Spent</p>
+              <h3 class="balance-text text-danger mb-0">UGX {{ "{:,.0f}".format(total_spent) }}</h3>
+            </div>
+            <div class="icon-box shadow-sm" style="background: rgba(239, 68, 68, 0.1); color: #ef4444">
+              <i class="bi bi-receipt-cutoff"></i>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="card glass-card overflow-hidden" style="min-height: auto">
-          <table class="table mb-0 table-hover align-middle">
-            <thead class="bg-light">
-              <tr>
-                <th class="ps-4 border-0 py-3 text-muted small">DESCRIPTION</th>
-                <th class="border-0 py-3 text-muted small">CATEGORY</th>
-                <th class="border-0 py-3 text-muted small text-center">STATUS</th>
-                <th class="pe-4 border-0 py-3 text-muted small text-end">AMOUNT</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for expense in expenses %}
-              <tr
-                class="align-middle border-bottom"
-                style="cursor: pointer"
-                data-id="{{ expense.id }}"
-                data-title="{{ expense.title }}"
-                data-category="{{ expense.category }}"
-                data-amount="{{ expense.amount }}"
-                data-date="{{ expense.date_to_handle.strftime('%d %b, %Y | %I:%M %p') }}"
-                onclick="handleRowClick(this)"
+      <div class="col">
+        <div class="card glass-card h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="card-label">Total Amount Remaining</p>
+              <h3 class="balance-text text-success mb-0">UGX {{ "{:,.0f}".format(total_remaining) }}</h3>
+            </div>
+            <div class="icon-box shadow-sm" style="background: rgba(34, 197, 94, 0.1); color: #22c55e">
+              <i class="bi bi-cash-stack"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card glass-card h-100">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="card-label">Amount Saved</p>
+              <h3 class="balance-text text-primary mb-0">UGX {{ "{:,.0f}".format(amount_saved) }}</h3>
+            </div>
+            <div class="icon-box shadow-sm" style="background: rgba(67, 97, 238, 0.1); color: #4361ee">
+              <i class="bi bi-graph-up-arrow"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h5 class="fw-bold mb-0">List | Registered Expenses</h5>
+      <button class="btn btn-primary px-4 py-2 rounded-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#expenseModal"><i class="bi bi-plus-lg me-2"></i>Record Expense</button>
+    </div>
+
+    <div class="card glass-card overflow-hidden">
+      <table class="table mb-0 table-hover align-middle">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4 border-0 py-3 text-muted small">DESCRIPTION</th>
+            <th class="border-0 py-3 text-muted small">CATEGORY</th>
+            <th class="border-0 py-3 text-muted small text-center">STATUS</th>
+            <th class="pe-4 border-0 py-3 text-muted small text-end">AMOUNT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expense in expenses %}
+          <tr
+            class="align-middle border-bottom"
+            style="cursor: pointer"
+            data-id="{{ expense.id }}"
+            data-title="{{ expense.title }}"
+            data-category="{{ expense.category }}"
+            data-amount="{{ expense.amount }}"
+            data-date="{{ expense.date_to_handle.strftime('%d %b, %Y | %I:%M %p') }}"
+            onclick="handleRowClick(this)"
+          >
+            <td class="ps-4 py-3">
+              <div class="d-flex flex-column">
+                <span class="fw-bold text-dark">{{ expense.title }}</span>
+                <small class="text-muted" style="font-size: 0.7rem"><i class="bi bi-calendar3 me-1"></i>{{ expense.date_to_handle.strftime('%d %b, %I:%M %p') }}</small>
+              </div>
+            </td>
+            <td>
+              <span
+                class="badge rounded-pill px-3 py-2 {% if expense.category in ['Savings', 'Investment'] %}bg-primary shadow-sm {% elif expense.category == 'Food' %}bg-warning text-dark {% elif expense.category == 'Transport' %}bg-info text-dark {% elif expense.category == 'Bills' %}bg-danger {% elif expense.category == 'Health' %}bg-success {% else %}bg-secondary{% endif %}"
               >
-                <td class="ps-4 py-3">
-                  <div class="d-flex flex-column">
-                    <span class="fw-bold text-dark">{{ expense.title }}</span>
-                    <small class="text-muted" style="font-size: 0.7rem"> <i class="bi bi-calendar3 me-1"></i>{{ expense.date_to_handle.strftime('%d %b, %I:%M %p') }} </small>
-                  </div>
-                </td>
-                <td>
-                  <span
-                    class="badge rounded-pill px-3 py-2 {% if expense.category == 'Savings' or expense.category == 'Investment' %}bg-primary shadow-sm {% elif expense.category == 'Food' %}bg-warning text-dark {% elif expense.category == 'Transport' %}bg-info text-dark {% elif expense.category == 'Bills' %}bg-danger {% elif expense.category == 'Health' %}bg-success {% else %}bg-secondary{% endif %}"
-                  >
-                    {{ expense.category }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  {% if expense.is_covered %}
-                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2"> <i class="bi bi-shield-check me-1"></i> Covered </span>
-                  {% else %}
-                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2"> <i class="bi bi-clock-history me-1"></i> Pending </span>
-                  {% endif %}
-                </td>
-                <td class="pe-4 text-end fw-bold {% if expense.category == 'Savings' %}text-primary{% else %}text-danger{% endif %}">{% if expense.category != 'Savings' %}-{% endif %}{{ "{:,.0f}".format(expense.amount) }}</td>
-              </tr>
+                {{ expense.category }}
+              </span>
+            </td>
+            <td class="text-center">
+              {% if expense.is_covered %}
+              <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2"> <i class="bi bi-shield-check me-1"></i> Covered </span>
               {% else %}
-              <tr>
-                <td colspan="4" class="text-center py-5 text-muted">
-                  <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                  No transactions recorded yet.
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- CLEAR ALL REGISTERED EXPENSES BUTTON ADDED AT THE END OF THE LIST OF REGISTERED EXPENSES -->
-        <div class="mt-3">
-          <button class="btn btn-outline-danger w-100 py-2 fw-bold" onclick="document.getElementById('reset-all-data').checked = true; toggleResetConfirm(true)" data-bs-toggle="modal" data-bs-target="#updateBalanceModal">
-            <i class="bi bi-trash3-fill me-2"></i> Clear All Expenses & Reset Dashboard
-          </button>
-        </div>
-      </main>
+              <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2"> <i class="bi bi-clock-history me-1"></i> Pending </span>
+              {% endif %}
+            </td>
+            <td class="pe-4 text-end fw-bold {% if expense.category == 'Savings' %}text-primary{% else %}text-danger{% endif %}">{% if expense.category != 'Savings' %}-{% endif %}{{ "{:,.0f}".format(expense.amount) }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="4" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No transactions recorded yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="mt-3">
+      <button class="btn btn-outline-danger w-100 py-2 fw-bold" onclick="document.getElementById('reset-all-data').checked = true; toggleResetConfirm(true)" data-bs-toggle="modal" data-bs-target="#updateBalanceModal">
+        <i class="bi bi-trash3-fill me-2"></i> Clear All Expenses & Reset Dashboard
+      </button>
+    </div>
+  </main>
+</div>
 
-    <!-- TOTAL BALANCE FEATURE INCLUDING WALLET, STEP-SIZE AND RESET BITS -->
-    <div class="modal fade" id="updateBalanceModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-card border-0">
-          <div class="modal-header border-0 pb-0">
-            <h5 class="fw-bold">Adjust Total Balance</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="updateBalanceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card border-0">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Adjust Total Balance</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-4">
+        <div id="balance-setup-view">
+          <div class="text-center mb-4">
+            <small class="text-muted text-uppercase fw-bold">Current Adjustment</small>
+            <div class="d-flex align-items-center justify-content-center gap-3 mt-2">
+              <button class="btn btn-outline-primary rounded-circle" onclick="adjustValue(-25000)" style="width: 45px; height: 45px">-</button>
+              <input type="number" id="balance-input" class="form-control form-control-lg text-center fw-bold border-0 bg-light" value="{{ total_balance }}" style="width: 200px; border-radius: 15px" />
+              <button class="btn btn-outline-primary rounded-circle" onclick="adjustValue(25000)" style="width: 45px; height: 45px">+</button>
+            </div>
+            <p class="small text-muted mt-3">Step size: 25,000 UGX</p>
           </div>
-          <div class="modal-body py-4">
-            <div id="balance-setup-view">
-              <div class="text-center mb-4">
-                <small class="text-muted text-uppercase fw-bold">Current Adjustment</small>
-                <div class="d-flex align-items-center justify-content-center gap-3 mt-2">
-                  <button class="btn btn-outline-primary rounded-circle" onclick="adjustValue(-25000)" style="width: 45px; height: 45px">-</button>
-                  <input type="number" id="balance-input" class="form-control form-control-lg text-center fw-bold border-0 bg-light" value="{{ total_balance }}" style="width: 200px; border-radius: 15px" />
-                  <button class="btn btn-outline-primary rounded-circle" onclick="adjustValue(25000)" style="width: 45px; height: 45px">+</button>
-                </div>
-                <p class="small text-muted mt-3">Step size: 25,000 UGX</p>
-              </div>
-
-              <div class="form-check form-switch d-flex justify-content-center gap-3 mb-4">
-                <input class="form-check-input" type="checkbox" id="reset-all-data" />
-                <label class="form-check-label fw-bold text-danger" for="reset-all-data">Reset all expenses & cards?</label>
-              </div>
-
-              <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm" onclick="checkResetFlag()">Update Balance</button>
-            </div>
-
-            <div id="reset-confirm-view" class="d-none text-center py-4">
-              <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex p-3 mb-3">
-                <i class="bi bi-exclamation-triangle-fill fs-2"></i>
-              </div>
-              <h4 class="fw-bold">Clear All Data?</h4>
-              <p class="text-muted small px-4">This will permanently delete every expense record and reset your Spent/Saved cards to zero. This cannot be undone.</p>
-
-              <div class="d-flex gap-2 mt-4">
-                <button class="btn btn-light rounded-pill fw-bold flex-grow-1" onclick="toggleResetConfirm(false)">No, Go Back</button>
-                <button class="btn btn-danger rounded-pill fw-bold flex-grow-1" onclick="saveNewBalance()">Yes, Clear All</button>
-              </div>
-            </div>
+          <div class="form-check form-switch d-flex justify-content-center gap-3 mb-4">
+            <input class="form-check-input" type="checkbox" id="reset-all-data" />
+            <label class="form-check-label fw-bold text-danger" for="reset-all-data">Reset all expenses & cards?</label>
+          </div>
+          <button class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm" onclick="checkResetFlag()">Update Balance</button>
+        </div>
+        <div id="reset-confirm-view" class="d-none text-center py-4">
+          <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex p-3 mb-3">
+            <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+          </div>
+          <h4 class="fw-bold">Clear All Data?</h4>
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-light rounded-pill fw-bold flex-grow-1" onclick="toggleResetConfirm(false)">No, Go Back</button>
+            <button class="btn btn-danger rounded-pill fw-bold flex-grow-1" onclick="saveNewBalance()">Yes, Clear All</button>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- RECORD NEW EXPENSE / ENTRY FEATURE -->
-    <div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content glass-card border-0">
-          <div class="modal-header border-0 pb-0">
-            <h5 class="fw-bold">Record New Entry</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card border-0">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Record New Entry</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-4">
+        <form id="expense-form">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">DESCRIPTION</label>
+            <input type="text" id="expense-desc" class="form-control border-0 bg-light rounded-3" placeholder="e.g., Savings for Christmas" required />
           </div>
-          <div class="modal-body py-4">
-            <form id="expense-form">
-              <div class="mb-3">
-                <label class="form-label small fw-bold text-muted">DESCRIPTION</label>
-                <input type="text" id="expense-desc" class="form-control border-0 bg-light rounded-3" placeholder="e.g., Savings for Christmas" required />
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small fw-bold text-muted">CATEGORY</label>
-                <select class="form-select border-0 bg-light rounded-3 shadow-sm" id="expense-category">
-                  <optgroup label="Essential">
-                    <option value="Food">🍎 Food & Dining</option>
-                    <option value="Transport">🚗 Transport & Fuel</option>
-                    <option value="Bills">🔌 Utilities & Bills</option>
-                    <option value="Rent">🏠 Rent/Mortgage</option>
-                  </optgroup>
-                  <optgroup label="Lifestyle">
-                    <option value="Shopping">🛍️ Shopping</option>
-                    <option value="Entertainment">🎬 Entertainment</option>
-                    <option value="Health">💊 Health & Medical</option>
-                  </optgroup>
-                  <optgroup label="Financial">
-                    <option value="Savings">💰 Savings</option>
-                    <option value="Investment">📈 Investment</option>
-                  </optgroup>
-                </select>
-              </div>
-
-              <div class="mb-4">
-                <label class="form-label small fw-bold text-muted">AMOUNT (UGX)</label>
-                <input type="number" id="expense-amount" class="form-control form-control-lg border-0 bg-light rounded-3 fw-bold text-primary" placeholder="0" required />
-              </div>
-
-              <button type="submit" id="save-btn" class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm">Save Entry</button>
-            </form>
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">CATEGORY</label>
+            <select class="form-select border-0 bg-light rounded-3 shadow-sm" id="expense-category">
+              <optgroup label="Essential">
+                <option value="Food">🍎 Food & Dining</option>
+                <option value="Transport">🚗 Transport & Fuel</option>
+                <option value="Bills">🔌 Utilities & Bills</option>
+                <option value="Rent">🏠 Rent/Mortgage</option>
+              </optgroup>
+              <optgroup label="Financial">
+                <option value="Savings">💰 Savings</option>
+                <option value="Investment">📈 Investment</option>
+              </optgroup>
+            </select>
           </div>
-        </div>
+          <div class="mb-4">
+            <label class="form-label small fw-bold text-muted">AMOUNT (UGX)</label>
+            <input type="number" id="expense-amount" class="form-control form-control-lg border-0 bg-light rounded-3 fw-bold text-primary" placeholder="0" required />
+          </div>
+          <button type="submit" id="save-btn" class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm">Save Entry</button>
+        </form>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="modal fade" id="expenseDetailModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content expense-modal-card">
-          <div class="modal-header border-0 pb-0">
-            <h5 class="fw-bold text-dark mb-0">Transaction Receipt</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="expenseDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content expense-modal-card">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold text-dark mb-0">Transaction Receipt</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="receipt-view">
+          <div class="text-center mb-4">
+            <div class="status-badge-container"><i class="bi bi-check-circle-fill text-success fs-1"></i></div>
+            <div class="fw-bold fs-4" id="modalAmount">UGX 0</div>
+            <div class="text-muted small text-uppercase">Transaction Verified</div>
           </div>
-
-          <div class="modal-body">
-            <div id="receipt-view">
-              <div class="text-center mb-4">
-                <div class="status-badge-container">
-                  <i class="bi bi-check-circle-fill text-success fs-1"></i>
-                </div>
-                <div class="fw-bold fs-4" id="modalAmount">UGX 0</div>
-                <div class="text-muted small text-uppercase">Transaction Verified</div>
-              </div>
-
-              <!-- TRANSACTION RECEIPT DETAILS AND DELETE FEATURES -->
-              <div class="detail-list">
-                <div class="detail-item">
-                  <span class="label">
-                    <i class="bi bi-pencil-square me-2 text-primary" id="enable-edit-desc" style="cursor: pointer" title="Click to edit"></i>
-                    Description
-                  </span>
-                  <div id="description-edit-container" class="d-flex align-items-center">
-                    <span class="value fw-medium" id="modalDescription">-</span>
-                  </div>
-                </div>
-                <div class="detail-item">
-                  <span class="label"><i class="bi bi-tag me-2"></i>Category</span>
-                  <span class="value" id="modalCategory">-</span>
-                </div>
-                <div class="detail-item">
-                  <span class="label"><i class="bi bi-calendar3 me-2"></i>Date & Time</span>
-                  <span class="value" id="modalDateTime">-</span>
-                </div>
-              </div>
+          <div class="detail-list">
+            <div class="detail-item">
+              <span class="label"><i class="bi bi-pencil-square me-2 text-primary" id="enable-edit-desc" style="cursor: pointer"></i> Description</span>
+              <span class="value fw-medium" id="modalDescription">-</span>
             </div>
-
-            <div id="confirm-view" class="d-none text-center py-4">
-              <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex p-3 mb-3">
-                <i class="bi bi-exclamation-triangle-fill fs-2"></i>
-              </div>
-              <h5 class="fw-bold">Delete Expense?</h5>
-              <p class="text-muted small px-4">This will permanently remove this record and reimburse your balance.</p>
+            <div class="detail-item">
+              <span class="label"><i class="bi bi-tag me-2"></i>Category</span>
+              <span class="value" id="modalCategory">-</span>
             </div>
-          </div>
-
-          <div class="modal-footer border-0 d-flex gap-2">
-            <input type="hidden" id="modalExpenseId" value="" />
-
-            <!-- RECEIPT FOOTER BUTTONS FOR MARKING AS PAID AND DELETION CONFIRMATION -->
-            <!-- Allows user to mark expense as paid and also delete the expense record -->
-            <div id="receipt-footer-btns" class="w-100 d-flex gap-2">
-              <button type="button" id="markPaidBtn" class="btn btn-success rounded-pill fw-bold flex-grow-1" onclick="markAsPaid()"><i class="bi bi-check-lg me-2"></i>Mark as Paid</button>
-
-              <button type="button" class="btn btn-outline-danger rounded-pill fw-bold" onclick="toggleDeleteConfirm(true)">
-                <i class="bi bi-trash3"></i>
-              </button>
-            </div>
-
-            <div id="confirm-footer-btns" class="w-100 d-flex gap-2 d-none">
-              <button type="button" class="btn btn-danger rounded-pill fw-bold flex-grow-1" onclick="executeDelete()">Yes, Delete</button>
-              <button type="button" class="btn btn-light rounded-pill fw-bold flex-grow-1" onclick="toggleDeleteConfirm(false)">Cancel</button>
+            <div class="detail-item">
+              <span class="label"><i class="bi bi-calendar3 me-2"></i>Date & Time</span>
+              <span class="value" id="modalDateTime">-</span>
             </div>
           </div>
         </div>
+        <div id="confirm-view" class="d-none text-center py-4">
+          <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex p-3 mb-3">
+            <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+          </div>
+          <h5 class="fw-bold">Delete Expense?</h5>
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex gap-2">
+        <input type="hidden" id="modalExpenseId" value="" />
+        <div id="receipt-footer-btns" class="w-100 d-flex gap-2">
+          <button type="button" id="markPaidBtn" class="btn btn-success rounded-pill fw-bold flex-grow-1" onclick="markAsPaid()"><i class="bi bi-check-lg me-2"></i>Mark as Paid</button>
+          <button type="button" class="btn btn-outline-danger rounded-pill fw-bold" onclick="toggleDeleteConfirm(true)"><i class="bi bi-trash3"></i></button>
+        </div>
+        <div id="confirm-footer-btns" class="w-100 d-flex gap-2 d-none">
+          <button type="button" class="btn btn-danger rounded-pill fw-bold flex-grow-1" onclick="executeDelete()">Yes, Delete</button>
+          <button type="button" class="btn btn-light rounded-pill fw-bold flex-grow-1" onclick="toggleDeleteConfirm(false)">Cancel</button>
+        </div>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock %}
