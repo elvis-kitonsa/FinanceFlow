@@ -29,7 +29,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
     <div class="alert alert-{{ category }} rounded-pill py-2 small text-center mb-3">{{ message }}</div>
     {% endfor %} {% endif %} {% endwith %}
-    <form method="POST">
+    <form method="POST" autocomplete="off">
       <div class="mb-3">
         <!-- Login button options: Email or Phone Number -->
         <div class="d-flex bg-light rounded-pill p-1 mb-3" style="border: 1px solid #20252c; font-size: 0.8rem">
@@ -62,7 +62,7 @@
         <div class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
           <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="key-round" size="30" class="text-muted"></i></span>
           <div style="width: 1px; height: 20px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-          <input type="password" name="password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Password" required />
+          <input type="password" name="password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Password" autocomplete="new-password" required />
         </div>
       </div>
 
@@ -208,5 +208,19 @@
 
   // Call this function when the page loads
   fetchAllCountries();
+
+  // This forces the fields to clear every time the page is refreshed (F5)
+  window.onload = function () {
+    const emailInput = document.getElementById("emailInput");
+    const phoneInput = document.getElementById("phoneInput");
+    const passwordInput = document.querySelector('input[name="password"]');
+
+    if (emailInput) emailInput.value = "";
+    if (phoneInput) phoneInput.value = "";
+    if (passwordInput) passwordInput.value = "";
+
+    // Optional: Reset the toggle to Email view on every refresh
+    toggleInput("email");
+  };
 </script>
 {% endblock %}
