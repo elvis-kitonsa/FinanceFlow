@@ -108,7 +108,8 @@ def login():
         # 3. Security Check
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
-            flash(f'Welcome back!', 'success')
+            
+            #flash(f'Welcome back!', 'success')
             return redirect(url_for('dashboard'))
         
         flash('No account found or invalid credentials.', 'danger')

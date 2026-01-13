@@ -222,5 +222,32 @@
     // Optional: Reset the toggle to Email view on every refresh
     toggleInput("email");
   };
+
+  // Show the login success overlay when the form is submitted
+  // This provides user feedback that login is in progress
+  document.querySelector("form").addEventListener("submit", function () {
+    const overlay = document.getElementById("login-success-overlay");
+    overlay.classList.remove("d-none");
+    lucide.createIcons(); // This ensures the shield-check icon renders immediately
+  });
 </script>
+
+<!-- Login Success Overlay -->
+<!-- This overlay appears upon successful login to provide user feedback -->
+<div id="login-success-overlay" class="d-none position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0, 0, 0, 0.4); z-index: 9999; backdrop-filter: blur(10px)">
+  <div class="neo-card text-center p-5 shadow-lg" style="max-width: 400px; border-radius: 40px; background: white">
+    <div class="mb-4">
+      <div class="rounded-circle d-inline-flex p-4" style="background: rgba(0, 0, 255, 0.1); color: #0000ff">
+        <i data-lucide="shield-check" style="width: 50px; height: 50px"></i>
+      </div>
+    </div>
+    <h2 class="fw-bold mb-2">Verified!</h2>
+    <p class="text-muted">Welcome back! Authentication successful.</p>
+    <div class="mt-4">
+      <div class="spinner-border" role="status" style="width: 1.5rem; height: 1.5rem; color: #0000ff"></div>
+      <p class="small text-muted mt-2">Entering Dashboard...</p>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
