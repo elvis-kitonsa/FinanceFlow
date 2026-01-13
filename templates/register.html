@@ -17,7 +17,7 @@
     </div>
 
     <!-- Form fields - Registration -->
-    <form method="POST">
+    <form method="POST" autocomplete="off">
       <div class="row g-3">
         <div class="col-md-6">
           <!-- Name Field -->
@@ -76,7 +76,7 @@
             <div class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
               <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="lock" size="18" class="text-muted"></i></span>
               <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="password" name="password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required />
+              <input type="password" name="password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required autocomplete="new-password" />
             </div>
           </div>
 
@@ -85,7 +85,7 @@
             <div id="confirmGroup" class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden; transition: all 0.3s ease">
               <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="shield-check" size="18" class="text-muted"></i></span>
               <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="password" id="confirm_password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required />
+              <input type="password" id="confirm_password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required autocomplete="new-password" />
             </div>
             <div id="matchText" class="ps-3 mt-1 small d-none" style="font-size: 0.75rem"></div>
           </div>
