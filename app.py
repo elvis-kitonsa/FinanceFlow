@@ -277,7 +277,7 @@ def budgets():
     ]
     
     # 4. Render the page
-    return render_template('budgets.html', 
+    return render_template('accounts.html', 
                            total_balance=total_balance, 
                            expenses=expenses,
                            savings_goals=savings_goals,
