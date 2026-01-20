@@ -41,23 +41,19 @@ def register():
         # Match these fields with your registration form - /templates/register.html
         # force the email to lowercase before it even hits the database
         email = request.form.get('email').strip().lower() # Add .lower() here!
-        country_code = request.form.get('country_code', '+256') # Get the hidden input from HTML
-        raw_phone = request.form.get('phone').strip()
-        phone = f"{country_code}{raw_phone}" # Joins them: +256770000000
         password = request.form.get('password')
         full_name = request.form.get('full_name')
         dob_str = request.form.get('dob') # This comes as a string "YYYY-MM-DD"
         
         # Check if email or phone already exists
-        if User.query.filter((User.email == email) | (User.phone == phone)).first():
-            flash('Email or Phone already registered!', 'danger')
+        if User.query.filter(User.email == email).first():
+            flash('Email already registered!', 'danger')
             return redirect(url_for('register'))
 
         # Create new user with only fields present in /templates/register.html
         try:
             new_user = User(
                 email=email,
-                phone=phone,
                 full_name=full_name,
                 password_hash=generate_password_hash(password),
                 dob=datetime.strptime(dob_str, '%Y-%m-%d').date() if dob_str else None,
@@ -90,20 +86,14 @@ def login():
     if request.method == 'POST':
         # 1. Get the specific fields from your modern toggle form
         email_val = request.form.get('email')
-        phone_val = request.form.get('phone')
-        c_code = request.form.get('country_code', '+256') # Get the prefix
         password = request.form.get('password')
         
         user = None
 
-        # 2. Logic: Decide which field to query based on what the user filled in
+        # 2. Logic: Use email address to find user
         if email_val:
             identifier = email_val.strip().lower()
             user = User.query.filter_by(email=identifier).first()
-        elif phone_val:
-            # Join the code and number to match the +256... format in the DB
-            identifier = f"{c_code}{phone_val.strip()}"
-            user = User.query.filter_by(phone=identifier).first()
 
         # 3. Security Check
         if user and check_password_hash(user.password_hash, password):
@@ -274,7 +264,6 @@ with app.app_context():
             email="admin@financeflow.com",
             password_hash=generate_password_hash("admin123"),
             full_name="Admin User",
-            phone="000000000",
             dob=date(1990, 1, 1),
             total_balance=0.0 # Initializing balance at 0
         )
