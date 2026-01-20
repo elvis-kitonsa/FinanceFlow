@@ -14,7 +14,6 @@ class User(UserMixin, db.Model):
     # Core Identity (Captured in your Form)
     full_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20), unique=True, nullable=False)
     dob = db.Column(db.Date, nullable=False)
     password_hash = db.Column(db.String(255), nullable=True)
     

@@ -11,8 +11,8 @@
       </div>
       <!-- App Logo with the blue M -->
       <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -1px">F<span style="color: #0000ff">M</span>S</h2>
-      <br />
       <h2 class="fw-bold text-dark mb-0" style="letter-spacing: -1px">Create Your <span style="color: #0000ff">Account</span></h2>
+      <br />
       <p class="text-muted small mb-0">Set up your private financial management profile.</p>
     </div>
 
@@ -37,24 +37,6 @@
               <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="mail" size="18" class="text-muted"></i></span>
               <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
               <input type="email" name="email" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Email address" required />
-            </div>
-          </div>
-
-          <!-- Phone Number Field -->
-          <div class="mb-2">
-            <label class="form-label small fw-bold text-dark ps-2 mb-1">Phone Number</label>
-            <div id="phoneContainer" class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; background: white">
-              <button class="btn btn-white border-0 dropdown-toggle text-dark fw-bold ps-3" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="activeCode" style="font-size: 0.85rem; border-radius: 50px 0 0 50px">+256</button>
-
-              <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-
-              <ul class="dropdown-menu shadow-lg border-0 p-2" id="countryItems" style="max-height: 250px; overflow-y: auto; width: 280px; z-index: 9999; position: absolute">
-                <li><span class="dropdown-item disabled small">Loading countries...</span></li>
-              </ul>
-
-              <input type="text" name="phone" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="000000000" maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required style="border-radius: 0 50px 50px 0" />
-
-              <input type="hidden" name="country_code" id="country_code_val" value="+256" />
             </div>
           </div>
         </div>
@@ -105,41 +87,9 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
-  // Function to update the selected code
-  function setCode(code) {
-    document.getElementById("activeCode").innerText = code;
-    document.getElementById("country_code_val").value = code;
-  }
-
-  async function fetchAllCountries() {
-    try {
-      const response = await fetch("https://restcountries.com/v3.1/all?fields=name,idd,flag");
-      const countries = await response.json();
-      const container = document.getElementById("countryItems");
-
-      // Sort alphabetically
-      countries.sort((a, b) => a.name.common.localeCompare(b.name.common));
-
-      let html = "";
-      countries.forEach((c) => {
-        // IDD handling for different API formats
-        if (c.idd && c.idd.root) {
-          const suffix = c.idd.suffixes && c.idd.suffixes.length === 1 ? c.idd.suffixes[0] : "";
-          const code = c.idd.root + suffix;
-          html += `<li><a class="dropdown-item small" href="javascript:void(0)" onclick="setCode('${code}')">${c.flag} ${code} (${c.name.common})</a></li>`;
-        }
-      });
-      container.innerHTML = html;
-    } catch (e) {
-      console.error("Error loading countries:", e);
-      document.getElementById("countryItems").innerHTML = '<li><a class="dropdown-item small" href="#">Error loading list</a></li>';
-    }
-  }
-
   // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     lucide.createIcons();
-    fetchAllCountries();
   });
 </script>
 {% endblock %}
