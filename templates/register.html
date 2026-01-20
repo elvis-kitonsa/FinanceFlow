@@ -20,61 +20,58 @@
     <form method="POST" autocomplete="off">
       <div class="row g-3">
         <div class="col-md-6">
-          <!-- Name Field -->
-          <div class="mb-2">
-            <label class="form-label small fw-bold text-dark ps-2 mb-1">Full Name</label>
-            <div class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
-              <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="user" size="18" class="text-muted"></i></span>
-              <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="text" name="full_name" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Name" required />
-            </div>
+          <label class="form-label small fw-bold text-dark ps-2 mb-1">Full Name</label>
+          <div class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
+            <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="user" size="18" class="text-muted"></i></span>
+            <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
+            <input type="text" name="full_name" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Name" required />
           </div>
-
-          <!-- Email Address Field -->
-          <div class="mb-2">
-            <label class="form-label small fw-bold text-dark ps-2 mb-1">Email Address</label>
-            <div class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
-              <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="mail" size="18" class="text-muted"></i></span>
-              <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="email" name="email" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Email address" required />
-            </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-dark ps-2 mb-1">Username</label>
+          <div class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
+            <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="at-sign" size="18" class="text-muted"></i></span>
+            <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
+            <input type="text" name="username" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Username" required />
           </div>
         </div>
 
-        <!-- Date of Birth Field -->
         <div class="col-md-6">
-          <div class="mb-2">
-            <label class="form-label small fw-bold text-dark ps-2 mb-1">Date of Birth</label>
-            <div class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
-              <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="calendar" size="18" class="text-muted"></i></span>
-              <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="date" name="dob" class="form-control border-0 py-2 shadow-none text-dark fw-medium" required />
-            </div>
+          <label class="form-label small fw-bold text-dark ps-2 mb-1">Email Address</label>
+          <div class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
+            <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="mail" size="18" class="text-muted"></i></span>
+            <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
+            <input type="email" name="email" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="Email address" required />
           </div>
-
-          <!-- Password Field -->
-          <div class="mb-2">
-            <label class="form-label small fw-bold text-dark ps-2 mb-1">Create a Password</label>
-            <div class="input-group input-group-merge shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
-              <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="lock" size="18" class="text-muted"></i></span>
-              <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="password" name="password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required autocomplete="new-password" />
-            </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-dark ps-2 mb-1">Date of Birth</label>
+          <div class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
+            <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="calendar" size="18" class="text-muted"></i></span>
+            <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
+            <input type="date" name="dob" class="form-control border-0 py-2 shadow-none text-dark fw-medium" required />
           </div>
+        </div>
 
-          <div class="mb-2">
-            <label class="form-label small fw-bold text-dark ps-2 mb-1">Repeat Password</label>
-            <div id="confirmGroup" class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden; transition: all 0.3s ease">
-              <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="shield-check" size="18" class="text-muted"></i></span>
-              <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
-              <input type="password" id="confirm_password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required autocomplete="new-password" />
-            </div>
-            <div id="matchText" class="ps-3 mt-1 small d-none" style="font-size: 0.75rem"></div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-dark ps-2 mb-1">Create Password</label>
+          <div class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
+            <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="lock" size="18" class="text-muted"></i></span>
+            <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
+            <input type="password" name="password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required autocomplete="new-password" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-dark ps-2 mb-1">Repeat Password</label>
+          <div id="confirmGroup" class="input-group shadow-sm rounded-pill" style="border: 1px solid #20252c; overflow: hidden">
+            <span class="input-group-text bg-white border-0 ps-3"><i data-lucide="shield-check" size="18" class="text-muted"></i></span>
+            <div style="width: 1px; height: 18px; background-color: #20252c; align-self: center; opacity: 0.4"></div>
+            <input type="password" id="confirm_password" class="form-control border-0 py-2 shadow-none text-dark fw-medium" placeholder="••••••••" required autocomplete="new-password" />
           </div>
         </div>
       </div>
 
-      <button type="submit" class="btn w-100 py-2 mt-3 shadow-sm rounded-pill fw-bold text-white" style="background-color: #0000ff; border: 1px solid #20252c">Complete Onboarding</button>
+      <button type="submit" class="btn w-100 py-2 mt-4 shadow-sm rounded-pill fw-bold text-white" style="background-color: #0000ff; border: 1px solid #20252c">Complete Onboarding</button>
     </form>
 
     <div class="text-center mt-3 pt-2" style="border-top: 1px solid #20252c">

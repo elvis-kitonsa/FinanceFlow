@@ -40,14 +40,15 @@ def register():
     if request.method == 'POST':
         # Match these fields with your registration form - /templates/register.html
         # force the email to lowercase before it even hits the database
-        email = request.form.get('email').strip().lower() # Add .lower() here!
-        password = request.form.get('password')
         full_name = request.form.get('full_name')
+        email = request.form.get('email').strip().lower() # Add .lower() here to standardize email case to lowercase
+        username = request.form.get('username').strip().lower() # Capture username
+        password = request.form.get('password')
         dob_str = request.form.get('dob') # This comes as a string "YYYY-MM-DD"
         
         # Check if email or phone already exists
-        if User.query.filter(User.email == email).first():
-            flash('Email already registered!', 'danger')
+        if User.query.filter((User.email == email) | (User.username == username)).first():
+            flash('Username or Email already registered!', 'danger')
             return redirect(url_for('register'))
 
         # Create new user with only fields present in /templates/register.html
@@ -55,6 +56,7 @@ def register():
             new_user = User(
                 email=email,
                 full_name=full_name,
+                username=username,
                 password_hash=generate_password_hash(password),
                 dob=datetime.strptime(dob_str, '%Y-%m-%d').date() if dob_str else None,
                 # total_balance=0.0 #This initializes the user's balance at 0 upon registration
@@ -93,7 +95,8 @@ def login():
         # 2. Logic: Use email address to find user
         if email_val:
             identifier = email_val.strip().lower()
-            user = User.query.filter_by(email=identifier).first()
+            # This is the "Dual Auth" magic: checks both columns for the input
+            user = User.query.filter((User.email == identifier) | (User.username == identifier)).first()
 
         # 3. Security Check
         if user and check_password_hash(user.password_hash, password):
@@ -262,6 +265,7 @@ with app.app_context():
     if not User.query.filter_by(email="admin@financeflow.com").first():
         admin = User(
             email="admin@financeflow.com",
+            username="admin", 
             password_hash=generate_password_hash("admin123"),
             full_name="Admin User",
             dob=date(1990, 1, 1),
