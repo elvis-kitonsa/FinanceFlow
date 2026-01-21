@@ -171,6 +171,41 @@
       .stat-card-body {
         padding: 1.25rem 1rem !important;
       }
+
+      /* --- The Grid Guardrail System --- */
+      .balance-card-grid {
+        display: grid;
+        /* Lane 1 (Text): Takes all available space. Lane 2 (Icon): Exactly 48px. */
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px; /* A permanent "no-man's land" between money and icon */
+        width: 100%;
+      }
+
+      .balance-text {
+        font-weight: 800;
+        white-space: nowrap;
+        display: block;
+        transition: font-size 0.3s ease;
+        /* Base size when sidebar is minimized (Plenty of room) */
+        font-size: 1.8rem;
+      }
+
+      /* Scale down ONLY when sidebar is expanded (Narrow dashboard) */
+      #main-wrapper:not(.expanded) .balance-text {
+        font-size: 1.35rem !important;
+      }
+
+      /* Ensure the icon box is locked and never moves */
+      .icon-box-fixed {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border-radius: 14px;
+      }
     </style>
   </head>
 
