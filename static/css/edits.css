@@ -293,3 +293,32 @@ h2,
   color: white !important;
   transform: translateY(-2px);
 }
+
+/* Premium Button Interactivity
+Note: Applied specifically to the "Add Expense" button in the expense modal 
+*/
+#expenseModal .btn-primary {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth architectural transition */
+  background: #0000ff !important;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+#expenseModal .btn-primary:hover {
+  background: #0000cc !important; /* Slightly deeper blue */
+  transform: translateY(-3px) scale(1.02); /* Slight lift and growth */
+  box-shadow: 0 10px 20px rgba(0, 0, 255, 0.2); /* Soft blue glow */
+}
+
+#expenseModal .btn-primary:active {
+  transform: translateY(0) scale(0.98); /* Tactile "press" effect */
+  box-shadow: 0 5px 10px rgba(0, 0, 255, 0.1);
+}
+
+/* Ensure the text stays upright and bold as requested */
+#expenseModal .btn-primary {
+  font-style: normal !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px;
+}
