@@ -222,57 +222,67 @@
   </div>
 </div>
 
+<!-- New Expense Modal: User can add a new expense -->
 <div class="modal fade" id="expenseModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content glass-card border-0">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="fw-bold">Record New Expense</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 35px; background: #ffffff">
+      <div class="modal-header border-0 p-4 pb-0">
+        <h5 class="fw-bold mb-0" style="color: #000000; font-style: normal">New Expenditure Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <!-- Expense Entry Form with a clear button for description -->
-      <div class="modal-body py-4">
-        <form id="expense-form">
-          <div class="mb-3">
-            <label class="small fw-bold text-muted mb-2 text-uppercase" style="letter-spacing: 1px">Description</label>
-            <div class="position-relative">
-              <input type="text" id="expense-description" class="form-control border-0 bg-white shadow-sm py-3" placeholder="Describe your expense" style="border-radius: 12px; padding-right: 45px" />
 
-              <button type="button" id="clear-desc" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted border-0" style="display: none; text-decoration: none; padding-right: 15px; outline: none; box-shadow: none">
-                <i class="bi bi-x-circle-fill fs-5"></i>
-              </button>
+      <div class="modal-body p-4">
+        <form id="expense-form">
+          <div class="mb-4">
+            <label class="small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 1px; font-style: normal">What is this for?</label>
+            <div class="input-group overflow-hidden shadow-sm" style="border-radius: 18px">
+              <span class="input-group-text border-0 bg-light px-3"><i class="bi bi-chat-left-text text-primary fs-5"></i></span>
+              <input type="text" id="expense-description" class="form-control border-0 bg-light py-3 fw-bold" placeholder="Describe your expense" style="font-style: normal" />
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label small fw-bold text-muted">CATEGORY</label>
-            <select class="form-select border-0 bg-light rounded-3 shadow-sm" id="expense-category">
-              <optgroup label="Essential & Home">
-                <option value="Food">🍽️ Food & Dining</option>
-                <option value="Transport">⛽ Transport & Fuel</option>
-                <option value="Bills">🔌 Utilities & Bills</option>
-                <option value="Rent">🏠 Rent & Mortgage</option>
-                <option value="Health">💊 Health & Medical</option>
-              </optgroup>
 
-              <optgroup label="Lifestyle & Personal">
-                <option value="Shopping">🛍️ Shopping</option>
-                <option value="Entertainment">🎟️ Entertainment</option>
-                <option value="Education">🎓 Learning & Skills</option>
-                <option value="PersonalCare">💈 Personal Care</option>
-              </optgroup>
-
-              <optgroup label="Financial & Future">
-                <option value="Savings">🏦 Savings</option>
-                <option value="Investment">📊 Investment</option>
-                <option value="Debt">💳 Debt & Loans</option>
-                <option value="Emergency">🚨 Emergency Fund</option>
-              </optgroup>
-            </select>
-          </div>
           <div class="mb-4">
-            <label class="form-label small fw-bold text-muted">AMOUNT (UGX)</label>
-            <input type="number" id="expense-amount" class="form-control form-control-lg border-0 bg-light rounded-3 fw-bold text-primary" placeholder="0" required />
+            <label class="small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 1px; font-style: normal">Select Expense Category</label>
+            <div class="position-relative">
+              <span class="position-absolute top-50 translate-middle-y ms-3" style="z-index: 5"><i class="bi bi-folder2-open text-primary"></i></span>
+              <select class="form-select border-0 bg-light py-3 fw-bold shadow-sm ps-5" id="expense-category" style="border-radius: 18px; font-style: normal; cursor: pointer">
+                <optgroup label="Essential & Home" style="font-style: normal; font-weight: bold">
+                  <option value="Food">🍽️ Food & Dining</option>
+                  <option value="Transport">⛽ Transport & Fuel</option>
+                  <option value="Bills">🔌 Utilities & Bills</option>
+                  <option value="Rent">🏠 Rent & Mortgage</option>
+                  <option value="Health">💊 Health & Medical</option>
+                  <option value="Insurance">🛡️ Insurance</option>
+                </optgroup>
+
+                <optgroup label="Lifestyle & Personal" style="font-style: normal; font-weight: bold">
+                  <option value="Shopping">🛍️ Shopping & Clothes</option>
+                  <option value="Entertainment">🎟️ Entertainment & Fun</option>
+                  <option value="Education">🎓 Learning & Skills</option>
+                  <option value="PersonalCare">💈 Personal Care</option>
+                  <option value="Gifts">🎁 Gifts & Donations</option>
+                </optgroup>
+
+                <optgroup label="Financial & Future" style="font-style: normal; font-weight: bold">
+                  <option value="Savings">🏦 Savings Deposit</option>
+                  <option value="Investment">📊 Investment Fund</option>
+                  <option value="Debt">💳 Debt & Loans</option>
+                  <option value="Emergency">🚨 Emergency Fund</option>
+                  <option value="Crypto">🪙 Crypto & Digital Assets</option>
+                </optgroup>
+              </select>
+            </div>
           </div>
-          <button type="submit" id="save-btn" class="btn btn-fms w-100 py-3 rounded-4 fw-bold shadow-sm">Save Entry</button>
+
+          <div class="mb-4">
+            <label class="small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 1px; font-style: normal">Amount to Cover Expense (UGX)</label>
+            <div class="input-group overflow-hidden shadow-sm" style="border-radius: 18px">
+              <span class="input-group-text border-0 bg-light fw-bold text-primary px-3">UGX</span>
+              <input type="number" id="expense-amount" class="form-control border-0 bg-light py-3 fw-bold fs-5" placeholder="0" required style="font-style: normal" />
+            </div>
+          </div>
+
+          <button type="submit" id="save-btn" class="btn btn-primary w-100 py-3 fw-bold rounded-4 shadow-sm" style="background: #0000ff !important; border-radius: 20px !important">Add Expense</button>
         </form>
       </div>
     </div>
