@@ -136,6 +136,25 @@
       #main-wrapper:not(.expanded) .balance-text {
         font-size: 1.35rem !important;
       }
+
+      /* --- INTERACTIVE INITIALS-ICON BOX --- */
+      .icon-box {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+
+      /* Hover effects for the icon box */
+      .icon-box:hover {
+        transform: translateY(-5px) scale(1.05); /* Slight lift and grow */
+        background: #0000ff !important; /* Switch to solid deep blue on hover */
+        color: #ffffff !important; /* Make icon white on hover */
+        box-shadow: 0 8px 20px rgba(0, 0, 255, 0.3) !important; /* Glowing blue shadow */
+        cursor: pointer;
+      }
+
+      /* Optional: Subtle pulse when clicking */
+      .icon-box:active {
+        transform: translateY(-2px) scale(0.98);
+      }
     </style>
   </head>
 
