@@ -265,21 +265,26 @@ def budgets():
     expenses = current_user.expenses 
     total_balance = current_user.total_balance
     
-    # 2. Logic for initials (keeping it consistent with the dashboard)
+    # 2. Calculate Category Totals
+    # IMPORTANT: Ensure 'Food' matches exactly what your frontend modal saves!
+    total_food_spent = sum(exp.amount for exp in expenses if exp.category == 'Food')
+
+    # 3. Logic for initials (keeping it consistent with the dashboard)
     name_parts = current_user.full_name.split()
     initials = "".join([part[0].upper() for part in name_parts[:2]])
 
-    # 3. Manual Savings Catalog Data (Static for now, can move to DB later)
+    # 4. Manual Savings Catalog Data (Static for now, can move to DB later)
     # This fulfills your requirement for a deeper detail savings catalog [cite: 2026-01-01]
     savings_goals = [
         {'name': 'Emergency Fund', 'target': 2000000, 'current': 500000, 'icon': 'bi-shield-check'},
         {'name': 'New Laptop', 'target': 3500000, 'current': 1200000, 'icon': 'bi-laptop'}
     ]
     
-    # 4. Render the page
+    # 5. Render the page
     return render_template('accounts.html', 
                            total_balance=total_balance, 
                            expenses=expenses,
+                           total_food_spent=total_food_spent,
                            savings_goals=savings_goals,
                            initials=initials)
 
