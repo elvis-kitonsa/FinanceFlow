@@ -346,3 +346,40 @@ function markAsPaid() {
       markPaidBtn.disabled = false;
     });
 }
+
+// 9. ASYNCHRONOUS EXPENSE SUBMISSION
+// Handles the submission of new expenses via the modal form when a user clicks "Add Expense"
+document.getElementById("expense-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  // Capture values from your new premium IDs
+  const description = document.getElementById("expense-description").value;
+  const category = document.getElementById("expense-category").value;
+  const amount = document.getElementById("expense-amount").value;
+
+  const expenseData = {
+    title: description,
+    category: category,
+    amount: parseFloat(amount),
+    date_to_handle: new Date().toISOString(), // Capturing current time for the task
+  };
+
+  try {
+    const response = await fetch("/add_expense", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(expenseData),
+    });
+
+    if (response.ok) {
+      // Success: Reload to show the new expense in the "Registered Expenses" table
+      window.location.reload();
+    } else {
+      alert("Error saving the expenditure task.");
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }
+});
