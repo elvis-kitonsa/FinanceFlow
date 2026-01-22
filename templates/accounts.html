@@ -59,40 +59,52 @@
       </div>
 
       <!-- Category Allocations Section with Accordion for Expenses -->
-      <div class="card glass-card p-4 border-0 mb-4" style="border-radius: 24px">
-        <h5 class="fw-bold mb-4" style="font-style: normal">Category Allocations</h5>
+      <div class="card glass-card p-4 border-0 mb-4" style="border-radius: 28px">
+        <h5 class="fw-bold mb-4" style="font-style: normal; color: #1a1d1f">Category Allocations</h5>
 
-        <div class="accordion accordion-flush" id="allocationAccordion">
-          <div class="accordion-item border-0 mb-3 bg-transparent">
-            <h2 class="accordion-header" id="headingMeals">
-              <button class="accordion-button collapsed shadow-sm d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMeals" style="border-radius: 18px; background: #ffffff; padding: 20px">
-                <div class="d-flex align-items-center gap-3">
-                  <div class="icon-circle bg-warning-subtle text-warning p-2 rounded-3">
-                    <i class="bi bi-egg-fried fs-4"></i>
+        <div class="accordion accordion-flush" id="categoryAccordion">
+          <div class="accordion-item border-0 mb-3 bg-light" style="border-radius: 20px; overflow: hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed px-4 py-3 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#groupFood" style="box-shadow: none">
+                <div class="d-flex align-items-center w-100">
+                  <div class="icon-box me-3 shadow-sm d-flex align-items-center justify-content-center" style="background: rgba(255, 193, 7, 0.1); color: #ffc107; width: 45px; height: 45px; border-radius: 12px">
+                    <i class="bi bi-egg-fried fs-5"></i>
                   </div>
-                  <div>
-                    <p class="mb-0 fw-bold text-dark" style="font-style: normal">Meals & Dining</p>
-                    <small class="text-muted">Total Budget: UGX 500,000</small>
-                  </div>
-                </div>
-                <div class="text-end me-3">
-                  <span class="fw-bold text-primary">UGX {{ total_food_spent }}</span>
-                  <div class="progress mt-1" style="height: 6px; width: 100px">
-                    <div class="progress-bar bg-primary" style="width: 65%"></div>
+
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="fw-bold text-dark" style="font-style: normal">Meals & Dining</span>
+                      <span class="fw-bold text-primary">UGX {{ "{:,.0f}".format(total_food_spent|default(0)) }}</span>
+                    </div>
+
+                    <div class="progress" style="height: 8px; border-radius: 10px; background: #e9ecef">
+                      {% set food_val = total_food_spent|default(0) %}
+                      <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (food_val / 500000 * 100)|round if food_val > 0 else 0 }}%;"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-1">
+                      <small class="text-muted" style="font-size: 0.7rem">BUDGET: UGX 500,000</small>
+                      <small class="text-muted" style="font-size: 0.7rem">SPENT</small>
+                    </div>
                   </div>
                 </div>
               </button>
             </h2>
-            <div id="collapseMeals" class="accordion-collapse collapse" data-bs-parent="#allocationAccordion">
-              <div class="accordion-body bg-light mt-2" style="border-radius: 15px">
-                <ul class="list-unstyled mb-0">
-                  {% for expense in expenses if expense.category == 'Food' %}
-                  <li class="d-flex justify-content-between align-items-center py-2 border-bottom border-white">
-                    <span class="small fw-medium text-muted"><i class="bi bi-dot me-1"></i>{{ expense.title }}</span>
-                    <span class="small fw-bold">UGX {{ "{:,.0f}".format(expense.amount) }}</span>
-                  </li>
-                  {% endfor %}
-                </ul>
+
+            <div id="groupFood" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
+              <div class="accordion-body px-4 py-3 border-top border-light">
+                {% for expense in expenses if expense.category == 'Food' %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div class="d-flex align-items-center">
+                    <i class="bi bi-dot text-warning fs-4"></i>
+                    <span class="small fw-bold text-muted" style="font-style: normal">{{ expense.title }}</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="small fw-bold text-dark">UGX {{ "{:,.0f}".format(expense.amount) }}</span>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteExpense('{{ expense.id }}')"><i class="bi bi-trash-fill small"></i></button>
+                  </div>
+                </div>
+                {% endfor %}
               </div>
             </div>
           </div>
