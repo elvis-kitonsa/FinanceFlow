@@ -226,11 +226,18 @@
         <h5 class="fw-bold">Record New Entry</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <!-- Expense Entry Form with a clear button for description -->
       <div class="modal-body py-4">
         <form id="expense-form">
           <div class="mb-3">
-            <label class="form-label small fw-bold text-muted">DESCRIPTION</label>
-            <input type="text" id="expense-desc" class="form-control border-0 bg-light rounded-3" placeholder="Describe your expense" required />
+            <label class="small fw-bold text-muted mb-2 text-uppercase" style="letter-spacing: 1px">Description</label>
+            <div class="position-relative">
+              <input type="text" id="expense-description" class="form-control border-0 bg-white shadow-sm py-3" placeholder="Describe your expense" style="border-radius: 12px; padding-right: 45px" />
+
+              <button type="button" id="clear-desc" class="btn btn-link position-absolute end-0 top-50 translate-middle-y text-muted border-0" style="display: none; text-decoration: none; padding-right: 15px; outline: none; box-shadow: none">
+                <i class="bi bi-x-circle-fill fs-5"></i>
+              </button>
+            </div>
           </div>
           <div class="mb-3">
             <label class="form-label small fw-bold text-muted">CATEGORY</label>
@@ -322,4 +329,22 @@
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
+<!-- Script to handle the clear button for the description input -->
+<script>
+  // Selecting the elements
+  const descInput = document.getElementById("expense-description");
+  const clearBtn = document.getElementById("clear-desc");
+
+  // Logic: Show the 'X' only if there is text
+  descInput.addEventListener("input", function () {
+    clearBtn.style.display = this.value.length > 0 ? "block" : "none";
+  });
+
+  // Logic: Clear the text when the 'X' is clicked
+  clearBtn.addEventListener("click", function () {
+    descInput.value = "";
+    this.style.display = "none";
+    descInput.focus();
+  });
+</script>
 {% endblock %}
