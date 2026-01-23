@@ -78,20 +78,25 @@
                         <small class="text-muted" style="font-size: 0.7rem">AGGREGATED EXPENSES</small>
                       </div>
                     </div>
+                    <!-- Total Spent and Progress Bar Section -->
                     <div class="text-end">
                       <h6 class="fw-bold text-primary mb-0">UGX {{ "{:,.0f}".format(total_food_spent|default(0)) }}</h6>
                       <small class="text-muted fw-bold" style="font-size: 0.65rem">TOTAL SPENT</small>
                     </div>
                   </div>
 
+                  <!-- Progress Bar and Percentage Section -->
                   <div class="progress-wrapper">
                     <div class="progress" style="height: 10px; border-radius: 10px; background: #f0f2f5">
-                      {% set food_val = total_food_spent|default(0) %} {% set percent = (food_val / 500000 * 100)|round|int %}
-                      <div class="progress-bar bg-warning" role="progressbar" style="width: {{ percent if percent <= 100 else 100 }}%;"></div>
+                      {% set food_val = total_food_spent|default(0) %} {# Calculate percentage based on Total Balance, not 500k #} {% set percent = (food_val / total_balance * 100)|round(1) if total_balance > 0 else 0 %}
+
+                      <div class="progress-bar" role="progressbar" style="width: {{ percent if percent <= 100 else 100 }}%; background-color: #0047FF;"></div>
                     </div>
+
                     <div class="d-flex justify-content-between mt-2">
-                      <small class="fw-bold text-muted" style="font-size: 0.7rem">BUDGET: UGX 500,000</small>
-                      <small class="fw-bold {{ 'text-danger' if food_val > 500000 else 'text-success' }}" style="font-size: 0.7rem"> {{ percent }}% USED </small>
+                      {# Removed the hardcoded 'BUDGET: UGX 500,000' #}
+                      <small class="fw-bold text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px"> Impact on Wallet </small>
+                      <small class="fw-bold text-primary" style="font-size: 0.7rem"> {{ percent }}% OF TOTAL FUNDS </small>
                     </div>
                   </div>
                 </div>
