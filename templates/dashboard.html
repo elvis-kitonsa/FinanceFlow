@@ -236,11 +236,20 @@
 
       <div class="modal-body p-4">
         <form id="expense-form">
+          <!-- Description Input Field -->
+          <!-- This field captures what the expense is for -->
           <div class="mb-4">
             <label class="small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 1px; font-style: normal">What is this for?</label>
-            <div class="input-group overflow-hidden shadow-sm" style="border-radius: 18px">
-              <span class="input-group-text border-0 bg-light px-3"><i class="bi bi-chat-left-text text-primary fs-5"></i></span>
-              <input type="text" id="expense-description" class="form-control border-0 bg-light py-3 fw-bold" placeholder="Describe your expense" style="font-style: normal" />
+            <div class="input-group overflow-hidden shadow-sm position-relative" style="border-radius: 18px">
+              <span class="input-group-text border-0 bg-light px-3">
+                <i class="bi bi-chat-left-text text-primary fs-5"></i>
+              </span>
+
+              <input type="text" id="expense-description" class="form-control border-0 bg-light py-3 fw-bold pe-5" placeholder="Describe your expense" style="font-style: normal" />
+
+              <button type="button" id="clear-desc-btn" class="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted d-none" style="z-index: 5; margin-right: 10px">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
             </div>
           </div>
 

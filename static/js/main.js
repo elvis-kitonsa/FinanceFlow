@@ -382,3 +382,22 @@ document.getElementById("expense-form").addEventListener("submit", async functio
     console.error("Fetch error:", error);
   }
 });
+
+const descInput = document.getElementById("expense-description");
+const clearDescBtn = document.getElementById("clear-desc-btn");
+
+// Show/Hide "X" based on typing - Capturing Expense Description Input
+descInput.addEventListener("input", function () {
+  if (this.value.trim().length > 0) {
+    clearDescBtn.classList.remove("d-none");
+  } else {
+    clearDescBtn.classList.add("d-none");
+  }
+});
+
+// Clear action
+clearDescBtn.addEventListener("click", function () {
+  descInput.value = "";
+  this.classList.add("d-none");
+  descInput.focus();
+});
