@@ -461,7 +461,7 @@ if (expenseForm) {
     // 3. Compare and Block if over budget
     if (enteredAmount > limit) {
       e.preventDefault(); // STOPS the form submission
-      showBudgetError(`Transaction Blocked! You only have UGX ${limit.toLocaleString()} remaining.`);
+      showBudgetError(`Expense not registered! You only have UGX ${limit.toLocaleString()} remaining.`);
 
       amountInput.classList.add("is-invalid");
       setTimeout(() => amountInput.classList.remove("is-invalid"), 3000);
