@@ -473,13 +473,29 @@
   </div>
 </div>
 
+<!-- Toast Notification for Budget Exceeding Alert -->
+<!-- This toast appears when a user tries to add an expense that exceeds their remaining balance -->
+<div id="budgetToast" class="position-fixed bottom-0 end-0 p-3" style="z-index: 2000">
+  <div class="toast align-items-center text-white bg-danger border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true" style="border-radius: 15px">
+    <div class="d-flex p-3">
+      <div class="toast-body d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+        <div>
+          <strong class="d-block">Transaction Blocked</strong>
+          <span id="toastErrorMessage">This amount exceeds your remaining balance.</span>
+        </div>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 <!-- Script to handle the clear button for the description input -->
 <script>
   // Selecting the elements
   const descInput = document.getElementById("expense-description");
-  const clearBtn = document.getElementById("clear-desc");
+  const clearBtn = document.getElementById("clear-desc-btn");
 
   // Logic: Show the 'X' only if there is text
   descInput.addEventListener("input", function () {

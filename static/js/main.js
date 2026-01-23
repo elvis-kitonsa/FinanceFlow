@@ -376,7 +376,7 @@ document.getElementById("expense-form").addEventListener("submit", async functio
       // Success: Reload to show the new expense in the "Registered Expenses" table
       window.location.reload();
     } else {
-      alert("Error saving the expenditure task.");
+      // alert("Error saving the expenditure task.");
     }
   } catch (error) {
     console.error("Fetch error:", error);
@@ -429,3 +429,42 @@ amountInput.addEventListener("input", function () {
     addBtn.innerText = "Add Expense";
   }
 });
+
+// 11. BUDGET OVERRUN TOAST NOTIFICATION
+// Shows a Bootstrap Toast if user tries to add an expense exceeding balance
+// Add this helper function to your main.js
+// Function to show the custom red Toast
+function showBudgetError(message) {
+  const toastEl = document.querySelector("#budgetToast .toast");
+  const toastBody = document.getElementById("toastErrorMessage");
+  if (toastEl && toastBody) {
+    toastBody.innerText = message;
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+  }
+}
+
+// Logic to prevent overspending
+// Logic to prevent overspending
+const expenseForm = document.getElementById("expense-form");
+
+if (expenseForm) {
+  expenseForm.addEventListener("submit", function (e) {
+    // 1. Target the input inside the function to avoid scope issues
+    const amountInput = document.getElementById("expense-amount");
+    const rawLimit = document.getElementById("current-remaining-val").innerText;
+
+    // 2. Convert text to numbers
+    const limit = parseFloat(rawLimit.replace(/[^0-9.-]+/g, ""));
+    const enteredAmount = parseFloat(amountInput.value);
+
+    // 3. Compare and Block if over budget
+    if (enteredAmount > limit) {
+      e.preventDefault(); // STOPS the form submission
+      showBudgetError(`Transaction Blocked! You only have UGX ${limit.toLocaleString()} remaining.`);
+
+      amountInput.classList.add("is-invalid");
+      setTimeout(() => amountInput.classList.remove("is-invalid"), 3000);
+    }
+  });
+}
