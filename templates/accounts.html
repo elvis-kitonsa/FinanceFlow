@@ -64,37 +64,34 @@
 
         <!-- Accordion for Expense Categories -->
         <div class="accordion accordion-flush" id="categoryAccordion">
+          {% for key, data in categories.items() %}
           <div class="accordion-item border-0 mb-3 bg-light" style="border-radius: 20px; overflow: hidden">
             <h2 class="accordion-header">
-              <button class="accordion-button collapsed px-4 py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#groupFood" style="box-shadow: none; border-radius: 20px">
+              <button class="accordion-button collapsed px-4 py-4 bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#group-{{ key }}" style="box-shadow: none; border-radius: 20px">
                 <div class="d-flex flex-column w-100">
                   <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center">
-                      <div class="icon-box me-3 shadow-sm d-flex align-items-center justify-content-center" style="background: rgba(255, 193, 7, 0.15) !important; color: #ffc107 !important; width: 48px; height: 48px; border-radius: 14px; visibility: visible !important; display: flex !important">
-                        <i class="bi bi-cup-straw fs-4"></i>
+                      <div class="icon-box me-3 shadow-sm d-flex align-items-center justify-content-center" style="background: {{ data.color }}26 !important; color: {{ data.color }} !important; width: 48px; height: 48px; border-radius: 14px; display: flex !important">
+                        <i class="bi {{ data.icon }} fs-4"></i>
                       </div>
                       <div>
-                        <h6 class="fw-bold mb-0 text-dark" style="font-style: normal">Meals & Dining</h6>
+                        <h6 class="fw-bold mb-0 text-dark">{{ data.display_name }}</h6>
                         <small class="text-muted" style="font-size: 0.7rem">AGGREGATED EXPENSES</small>
                       </div>
                     </div>
-                    <!-- Total Spent and Progress Bar Section -->
                     <div class="text-end">
-                      <h6 class="fw-bold text-primary mb-0">UGX {{ "{:,.0f}".format(total_food_spent|default(0)) }}</h6>
+                      <h6 class="fw-bold text-primary mb-0">UGX {{ "{:,.0f}".format(data.total | float) }}</h6>
                       <small class="text-muted fw-bold" style="font-size: 0.65rem">TOTAL SPENT</small>
                     </div>
                   </div>
 
-                  <!-- Progress Bar and Percentage Section -->
                   <div class="progress-wrapper">
                     <div class="progress" style="height: 10px; border-radius: 10px; background: #f0f2f5">
-                      {% set food_val = total_food_spent|default(0) %} {# Calculate percentage based on Total Balance, not 500k #} {% set percent = (food_val / total_balance * 100)|round(1) if total_balance > 0 else 0 %}
-
-                      <div class="progress-bar" role="progressbar" style="width: {{ percent if percent <= 100 else 100 }}%; background-color: #0047FF;"></div>
+                      {% set percent = (data.total / total_balance * 100)|round(1) if total_balance > 0 else 0 %}
+                      <div class="progress-bar" role="progressbar" style="width: {{ percent if percent <= 100 else 100 }}%; background-color: {{ data.color }};"></div>
                     </div>
 
                     <div class="d-flex justify-content-between mt-2">
-                      {# Removed the hardcoded 'BUDGET: UGX 500,000' #}
                       <small class="fw-bold text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px"> Impact on Wallet </small>
                       <small class="fw-bold text-primary" style="font-size: 0.7rem"> {{ percent }}% OF TOTAL FUNDS </small>
                     </div>
@@ -103,23 +100,26 @@
               </button>
             </h2>
 
-            <div id="groupFood" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
+            <div id="group-{{ key }}" class="accordion-collapse collapse" data-bs-parent="#categoryAccordion">
               <div class="accordion-body px-4 py-3 border-top border-light">
-                {% for expense in expenses if expense.category == 'Food' %}
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                {% for expense in data.expense_list %}
+                <div class="d-flex justify-content-between align-items-center mb-3" data-expense-id="{{ expense.id }}">
                   <div class="d-flex align-items-center">
-                    <i class="bi bi-dot text-warning fs-4"></i>
-                    <span class="small fw-bold text-muted" style="font-style: normal">{{ expense.title }}</span>
+                    <i class="bi bi-dot fs-4" style="color: {{ data.color }}"></i>
+                    <span class="small fw-bold text-muted">{{ expense.title }}</span>
                   </div>
                   <div class="d-flex align-items-center gap-3">
                     <span class="small fw-bold text-dark">UGX {{ "{:,.0f}".format(expense.amount) }}</span>
-                    <button class="btn btn-link text-danger p-0" onclick="deleteExpense('{{ expense.id }}')"><i class="bi bi-trash-fill small"></i></button>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteExpense('{{ expense.id }}')">
+                      <i class="bi bi-trash-fill small"></i>
+                    </button>
                   </div>
                 </div>
                 {% endfor %}
               </div>
             </div>
           </div>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -388,12 +388,16 @@
 
   // 4. Delete an individual expense task
   function deleteExpense(id) {
-    if (confirm("Permanently delete this to-do item? This will update your available budget.")) {
-      const row = document.querySelector(`[data-expense-id='${id}']`);
-      if (row) {
-        row.remove();
-        updateCategoryMath("food");
-      }
+    if (confirm("Permanently delete this item?")) {
+      // Find the expense by ID and remove it
+      // Note: You need to add 'data-expense-id' to your HTML div for this to work
+      fetch(`/delete_expense/${id}`, { method: "POST" })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.status === "success") {
+            location.reload(); // Simplest way to update all totals
+          }
+        });
     }
   }
 
@@ -407,5 +411,29 @@
       descSpan.innerText = newDesc.trim();
     }
   }
+
+  // 6. Delete Expense with balance reimbursement
+  function deleteExpense(expense_id) {
+    if (!confirm("Are you sure you want to delete this expense? Your balance will be reimbursed.")) return;
+
+    fetch(`/delete_expense/${expense_id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "success") {
+          // Option 1: Reload to update all math (Safest)
+          location.reload();
+
+          // Option 2: Or remove the element manually to be "snappy"
+          // document.querySelector(`[data-expense-id="${expense_id}"]`).remove();
+        } else {
+          alert("Error: " + data.message);
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  }
 </script>
+
 {% endblock %}

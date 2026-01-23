@@ -173,36 +173,41 @@ def update_balance():
 def add_expense():
     data = request.get_json()
     try:
-        # We use 'description' to match your JavaScript 'expenseData' object
+        amount = float(data['amount'])
         new_entry = Expense(
             title=data['title'],
             category=data['category'],
-            amount=float(data['amount']),
-            user_id=current_user.id, # Link it to the logged-in user
-            date_to_handle=datetime.now() # Automatically sets the time to right now
+            amount=amount,
+            user_id=current_user.id,
+            date_to_handle=datetime.now(),
+            is_covered=True # Default to true if you want immediate balance impact
         )
+        
+        # Deduct from balance immediately when an expense/saving is added
+        current_user.total_balance -= amount
+        
         db.session.add(new_entry)
         db.session.commit()
-        return jsonify({"status": "success"})
+        return jsonify({"status": "success", "new_balance": current_user.total_balance})
     except Exception as e:
-        print(f"Error saving expense: {e}")
+        db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/delete_expense/<int:expense_id>', methods=['DELETE'])
-@login_required # Always ensure user is logged in first
+@login_required
 def delete_expense(expense_id):
-    # 1. Find the expense in the database
     expense = Expense.query.get_or_404(expense_id)
-
-    # 2. TINY REFINEMENT: Ownership Check
     if expense.user_id != current_user.id:
         return jsonify({"status": "error", "message": "Unauthorized"}), 403
 
     try:
-        # 3. Delete the record
+        # NEW: If the expense was "covered/paid", add the money back to the balance
+        if expense.is_covered:
+            current_user.total_balance += expense.amount
+            
         db.session.delete(expense)
         db.session.commit()
-        return jsonify({"status": "success", "message": "Expense reimbursed and deleted"}), 200
+        return jsonify({"status": "success", "new_balance": current_user.total_balance}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -261,30 +266,67 @@ def mark_paid(expense_id):
 @app.route('/accounts') # This matches your sidebar link
 @login_required
 def budgets():
-    # 1. Fetch actual data from the logged-in user to ensure dashboard sync
-    expenses = current_user.expenses 
+
+    # 1. Define the mapping for icons and colors
+    category_map = {
+        # Essential & Home
+        'Food': {'name': 'Food & Dining', 'icon': 'bi-cup-straw', 'color': '#ffc107'},
+        'Transport': {'name': 'Transport & Fuel', 'icon': 'bi-fuel-pump', 'color': '#0dcaf0'},
+        'Bills': {'name': 'Utilities & Bills', 'icon': 'bi-lightning-charge', 'color': '#fd7e14'},
+        'Rent': {'name': 'Rent & Mortgage', 'icon': 'bi-house-door', 'color': '#6610f2'},
+        'Health': {'name': 'Health & Medical', 'icon': 'bi-capsule', 'color': '#dc3545'},
+        'Insurance': {'name': 'Insurance', 'icon': 'bi-shield-shaded', 'color': '#0d6efd'},
+        
+        # Lifestyle & Personal
+        'Shopping': {'name': 'Shopping & Clothes', 'icon': 'bi-bag-heart', 'color': '#e83e8c'},
+        'Entertainment': {'name': 'Entertainment & Fun', 'icon': 'bi-ticket-perforated', 'color': '#6f42c1'},
+        'Education': {'name': 'Learning & Skills', 'icon': 'bi-book', 'color': '#17a2b8'},
+        'PersonalCare': {'name': 'Personal Care', 'icon': 'bi-scissors', 'color': '#adb5bd'},
+        'Gifts': {'name': 'Gifts & Donations', 'icon': 'bi-gift', 'color': '#ff6b6b'},
+        
+        # Financial & Future
+        'Savings': {'name': 'Savings Deposit', 'icon': 'bi-bank', 'color': '#198754'},
+        'Investment': {'name': 'Investment Fund', 'icon': 'bi-graph-up-arrow', 'color': '#20c997'},
+        'Debt': {'name': 'Debt & Loans', 'icon': 'bi-credit-card-2-front', 'color': '#343a40'},
+        'Emergency': {'name': 'Emergency Fund', 'icon': 'bi-shield-lock', 'color': '#dc3545'},
+        'Crypto': {'name': 'Crypto & Digital Assets', 'icon': 'bi-currency-bitcoin', 'color': '#f7931a'}
+    }
+
+    # 2. Fetch actual data from the logged-in user to ensure dashboard sync
+    expenses = current_user.expenses
     total_balance = current_user.total_balance
     
-    # 2. Calculate Category Totals
-    # IMPORTANT: Ensure 'Food' matches exactly what your frontend modal saves!
-    total_food_spent = sum(exp.amount for exp in expenses if exp.category == 'Food')
+    # 3. Process only categories that have expenses
+    active_categories = {}
+    for exp in expenses:
+        cat_key = exp.category
+        if cat_key not in active_categories:
+            mapping = category_map.get(cat_key, {'name': cat_key, 'icon': 'bi-folder', 'color': '#0047FF'})
+            active_categories[cat_key] = {
+                'display_name': mapping['name'],
+                'icon': mapping['icon'],
+                'color': mapping['color'],
+                'total': 0,
+                'expense_list': []  # RENAME THIS FROM 'items' TO 'expense_list'
+            }
+        active_categories[cat_key]['total'] += exp.amount
+        active_categories[cat_key]['expense_list'].append(exp)
 
-    # 3. Logic for initials (keeping it consistent with the dashboard)
+    # 4. Logic for initials (keeping it consistent with the dashboard)
     name_parts = current_user.full_name.split()
     initials = "".join([part[0].upper() for part in name_parts[:2]])
 
-    # 4. Manual Savings Catalog Data (Static for now, can move to DB later)
+    # 5. Manual Savings Catalog Data (Static for now, can move to DB later)
     # This fulfills your requirement for a deeper detail savings catalog [cite: 2026-01-01]
     savings_goals = [
         {'name': 'Emergency Fund', 'target': 2000000, 'current': 500000, 'icon': 'bi-shield-check'},
         {'name': 'New Laptop', 'target': 3500000, 'current': 1200000, 'icon': 'bi-laptop'}
     ]
     
-    # 5. Render the page
+    # 6. Render the page
     return render_template('accounts.html', 
                            total_balance=total_balance, 
-                           expenses=expenses,
-                           total_food_spent=total_food_spent,
+                           categories=active_categories,
                            savings_goals=savings_goals,
                            initials=initials)
 
