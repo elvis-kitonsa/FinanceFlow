@@ -517,7 +517,7 @@
   function markAsPaid() {
     const expenseId = document.getElementById("modalExpenseId").value;
 
-    fetch(`/mark_as_paid/${expenseId}`, {
+    fetch(`/mark_paid/${expenseId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
     })
@@ -527,6 +527,7 @@
           // Refresh the page to show the "Covered" status and updated remaining balance
           location.reload();
         } else {
+          // Optional: Use our new showBudgetError instead of alert
           alert("Error updating expense: " + data.message);
         }
       })
