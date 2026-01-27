@@ -128,7 +128,7 @@
      onmouseout="this.style.transform='translateY(0)'">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <small class="text-white-50 d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Avg. Daily Burn</small>
+            <small class="text-white d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem;">Avg. Daily Burn</small>
             <h3 class="fw-bold mb-0">UGX {{ "{:,.0f}".format(avg_burn) }}</h3>
         </div>
         <div class="rounded-circle p-3" style="background: rgba(255, 255, 255, 0.2);">
@@ -147,7 +147,7 @@
      onmouseout="this.style.transform='translateY(0)'">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <small class="text-white-50 d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Efficiency</small>
+            <small class="text-white d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem;">Efficiency</small>
             <h3 class="fw-bold mb-0">
                 {% if spend_ratio < 50 %} Optimized
                 {% elif spend_ratio < 85 %} Moderate
