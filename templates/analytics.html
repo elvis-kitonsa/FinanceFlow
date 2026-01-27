@@ -132,39 +132,26 @@
         </div>
       </div>
 
-      <div class="card glass-card border-0 p-4 shadow-sm mt-4" style="border-radius: 24px">
+      <div class="card glass-card border-0 p-4 shadow-sm mt-4 text-dark" 
+     data-bs-toggle="modal" 
+     data-bs-target="#efficiencyInfoModal"
+     style="border-radius: 24px; cursor: pointer; transition: transform 0.2s;"
+     onmouseover="this.style.transform='translateY(-5px)'"
+     onmouseout="this.style.transform='translateY(0)'">
     <div class="d-flex align-items-center gap-3">
         <div class="icon-box bg-success-subtle text-success rounded-circle p-3">
             <i class="bi bi-graph-down-arrow fs-4"></i>
         </div>
-
-        <!-- Spending Efficiency Insight -->
-        <!-- Displays efficiency based on spend ratio -->
         <div>
             <small class="text-muted d-block fw-bold text-uppercase">Spending Efficiency</small>
             <span class="fw-bold fs-5">
-                {% if spend_ratio < 50 %}
-                    Optimized
-                {% elif spend_ratio < 85 %}
-                    Moderate
-                {% else %}
-                    Critical
-                {% endif %}
+                {% if spend_ratio < 50 %} Optimized
+                {% elif spend_ratio < 85 %} Moderate
+                {% else %} Critical {% endif %}
             </span>
         </div>
     </div>
-    <div class="mt-3">
-        <div class="d-flex justify-content-between mb-1">
-            <small class="text-muted">Budget Utilization</small>
-            <small class="fw-bold">{{ spend_ratio|round(1) }}%</small>
-        </div>
-        <div class="progress" style="height: 6px;">
-            <div class="progress-bar {% if spend_ratio > 85 %}bg-danger{% else %}bg-primary{% endif %}" 
-                 role="progressbar" 
-                 style="width: {{ spend_ratio }}%"></div>
-        </div>
     </div>
-</div>
     </div>
   </div>
 </main>
@@ -374,6 +361,54 @@ document.querySelectorAll('#custom-legend .badge').forEach((badge, i) => {
       </div>
     </div>
   </div>
+</div>
+
+<!-- Efficiency Info Modal -->
+<!-- Provides insights into spending efficiency -->
+<!-- Displays a popup modal with spending efficiency details -->
+<div class="modal fade" id="efficiencyInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 30px;">
+            <div class="modal-header border-0 p-4 pb-0">
+                <h5 class="fw-bold mb-0">Efficiency Breakdown</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle d-inline-flex p-3 mb-2" style="background: rgba(25, 135, 84, 0.1); color: #198754">
+                        <i class="bi bi-shield-check fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold">Your Budget Health</h4>
+                </div>
+                
+                <div class="bg-light p-3 rounded-4 mb-3">
+                    <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.65rem">Current Status</small>
+                    <p class="small">
+                        You have utilized <strong>{{ spend_ratio|round(1) }}%</strong> of your total allocated budget. 
+                        This calculation compares your total expenses against your starting balance.
+                    </p>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="p-2 border rounded-3 text-center">
+                            <small class="text-muted d-block">Spent</small>
+                            <span class="fw-bold text-danger">UGX {{ "{:,.0f}".format(total_spent) }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 border rounded-3 text-center">
+                            <small class="text-muted d-block">Remaining</small>
+                            <span class="fw-bold text-success">UGX {{ "{:,.0f}".format(total_balance) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-dark w-100 py-3 rounded-4 fw-bold" data-bs-dismiss="modal">Close Insight</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
