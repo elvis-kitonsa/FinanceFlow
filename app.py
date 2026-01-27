@@ -412,7 +412,7 @@ def analytics():
     for e in sorted_expenses:
         date_str = e.date_to_handle.strftime('%Y-%m-%d')
         
-        # Logic: If it's NOT a savings deposit, it's a 'Burn' (Spending)
+        # We only 'burn' money on spending, not savings allocations
         if e.category != 'Savings':
             # Use abs() to ensure the graph trends UPWARD even if stored as negative
             cumulative_burn += abs(e.amount)
@@ -429,28 +429,34 @@ def analytics():
     # Avg Daily Burn = Total Outflow / Days Active
     avg_daily_burn = cumulative_burn / days_elapsed
     
-    # Current Wallet Balance (This is your UGX 0.00 cash on hand)
-    current_wallet_balance = current_user.total_balance
+    # 4. THE FIX: Calculate Real Remaining Cash
+    # Matches Dashboard: Total Set - (Spent + Saved)
+    total_spent_so_far = sum(abs(e.amount) for e in expenses if e.category != 'Savings')
+    total_saved_so_far = sum(abs(e.amount) for e in expenses if e.category == 'Savings')
     
-    # Runway Calculation: How many days until balance hits 0
+    # This is your UGX 625,000
+    effective_balance = current_user.total_balance - (total_spent_so_far + total_saved_so_far)
+
+    # 5. Calculate Real Runway
+    # 625,000 / 491,667 = ~1.27 Days
     if avg_daily_burn > 0:
-        days_left = max(0, current_wallet_balance / avg_daily_burn)
-        projected_date_obj = datetime.utcnow() + timedelta(days=days_left)
-        projected_date_str = projected_date_obj.strftime('%d %b, %Y')
+        days_left = max(0, effective_balance / avg_daily_burn)
+        projected_date = now + timedelta(days=days_left)
+        projected_date_str = projected_date.strftime('%d %b, %Y')
     else:
         days_left = 0
         projected_date_str = "N/A"
 
     return render_template('analytics.html', 
                            initials=initials,
-                           current_day=current_day,
-                           current_date=current_date,
-                           daily_data=dict(daily_data), # Convert back to regular dict for JS
+                           current_day=now.strftime('%A'),
+                           current_date=now.strftime('%b %d, %Y'),
+                           daily_data=dict(daily_data),
                            total_spent=cumulative_burn,
                            avg_burn=avg_daily_burn,
                            projected_date=projected_date_str,
-                           days_left=int(days_left),
-                           total_balance=current_wallet_balance)
+                           days_left=int(days_left), # Will now show 1 Day
+                           total_balance=effective_balance)
 
 # PRINT RECEIPT ROUTE
 # Generates printable expense reports based on user selection
