@@ -93,51 +93,71 @@
     gradient.addColorStop(1, 'rgba(0, 0, 255, 0)');
 
     new Chart(ctx, {
-      type: 'line',
-      data: {
+    type: 'line',
+    data: {
         labels: labels,
         datasets: [{
-          label: 'Cumulative Spend',
-          data: dataPoints,
-          borderColor: '#0000ff', 
-          borderWidth: 3,
-          backgroundColor: gradient,
-          fill: true,
-          tension: 0.4,
-          pointBackgroundColor: '#ffffff',
-          pointBorderColor: '#0000ff', 
-          pointHoverRadius: 6
-        }] // This was the missing bracket that broke the chart
-      },
-      options: {
+            label: 'Cumulative Spend',
+            data: dataPoints,
+            borderColor: '#0000ff',
+            borderWidth: 4, // Thicker line for better visibility
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.45, // Smoother "Cubic" curves
+            pointRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#0000ff',
+            pointBorderWidth: 3,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: '#0000ff',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
+        }]
+    },
+    options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+            intersect: false,
+            mode: 'index',
+        },
         plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#1a1d1f',
-            padding: 12,
-            callbacks: {
-              label: (context) => 'Total: UGX ' + context.parsed.y.toLocaleString()
+            legend: { display: false },
+            tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(26, 29, 31, 0.9)', // Darker, sleek tooltip
+                titleFont: { size: 14, weight: 'bold', family: 'Plus Jakarta Sans' },
+                bodyFont: { size: 13, family: 'Plus Jakarta Sans' },
+                padding: 12,
+                cornerRadius: 12,
+                displayColors: false,
+                callbacks: {
+                    label: (context) => 'Total Spent: UGX ' + context.parsed.y.toLocaleString()
+                }
             }
-          }
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false },
-            ticks: {
-              callback: v => 'UGX ' + (v/1000) + 'k',
-              font: { family: 'Plus Jakarta Sans' }
+            y: {
+                beginAtZero: true,
+                border: { display: true },
+                grid: { color: 'rgba(0,0,0,0.03)', drawBorder: false },
+                ticks: {
+                    callback: v => 'UGX ' + (v >= 1000 ? (v/1000).toFixed(1) + 'k' : v),
+                    font: { family: 'Plus Jakarta Sans', size: 11 },
+                    padding: 10
+                }
+            },
+            x: {
+                border: { display: true },
+                grid: { display: false },
+                ticks: { 
+                    font: { family: 'Plus Jakarta Sans', size: 11 },
+                    padding: 10 
+                }
             }
-          },
-          x: {
-            grid: { display: false },
-            ticks: { font: { family: 'Plus Jakarta Sans' } }
-          }
         }
-      }
-    });
+    }
+});
   });
 </script>
 
