@@ -7,7 +7,6 @@ from sqlalchemy import extract
 from datetime import datetime, timedelta
 from collections import defaultdict
 import requests
-import os
 
 
 
@@ -153,6 +152,9 @@ def dashboard():
                            total_saved=amount_saved,
                            initials=initials) # Send initials to the frontend
 
+# --- EXPENSE MANAGEMENT ROUTES ---
+# 1. Update Balance Route
+# Updates the user's total balance and optionally resets expenses
 @app.route('/update_balance', methods=['POST'])
 @login_required
 def update_balance():
@@ -174,6 +176,8 @@ def update_balance():
             db.session.rollback()
             return jsonify({"status": "error", "message": str(e)}), 500
 
+# 2. Add Expense Route
+# Adds a new expense entry for the logged-in user
 @app.route('/add_expense', methods=['POST'])
 @login_required
 def add_expense():
@@ -217,6 +221,8 @@ def add_expense():
         db.session.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# 3. Delete Expense Route
+# Deletes an expense entry by its ID
 @app.route('/delete_expense/<int:expense_id>', methods=['DELETE'])
 @login_required
 def delete_expense(expense_id):
@@ -239,6 +245,8 @@ def delete_expense(expense_id):
 # Update description with new content set in the Transaction Receipt card
 # This is the card that pops up when you click on an already registered expense in the dashboard list
 
+# 4. Update Expense Description Route
+# Updates the title/description of an existing expense
 @app.route('/update_expense_description/<int:expense_id>', methods=['POST'])
 @login_required
 def update_expense_description(expense_id):
@@ -264,7 +272,7 @@ def update_expense_description(expense_id):
             db.session.rollback()
             return jsonify({"status": "error", "message": str(e)}), 500
 
-# MARK AS PAID ROUTE
+# 5. MARK AS PAID ROUTE
 # Updates the 'is_covered' status of an expense to True
 @app.route('/mark_paid/<int:expense_id>', methods=['POST'])
 @login_required
@@ -444,9 +452,14 @@ def analytics():
     # Matches Dashboard: Total Set - (Spent + Saved)
     total_spent_so_far = sum(abs(e.amount) for e in expenses if e.category != 'Savings')
     total_saved_so_far = sum(abs(e.amount) for e in expenses if e.category == 'Savings')
-    
-    # This is your UGX 625,000
     effective_balance = current_user.total_balance - (total_spent_so_far + total_saved_so_far)
+
+    # --- ADD THIS NEW LOGIC HERE ---
+    import calendar
+    days_in_month = calendar.monthrange(now.year, now.month)[1]
+    days_remaining = max(1, days_in_month - now.day) 
+    daily_limit = effective_balance / days_remaining
+    # -------------------------------
 
     # 5. Calculate Real Runway
     # 625,000 / 491,667 = ~1.27 Days
@@ -482,6 +495,7 @@ def analytics():
                            days_left=int(days_left), # Will now show 1 Day
                            savings_ratio=savings_ratio, 
                            spend_ratio=spend_ratio,
+                           daily_limit=daily_limit,
                            category_data=dict(category_data),
                            total_balance=effective_balance)
 

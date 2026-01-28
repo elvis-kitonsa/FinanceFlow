@@ -54,7 +54,6 @@
           </div>
         </div>
       </div>
-
       <!-- Spending by Category Card -->
       <!-- Displays a doughnut chart of spending by category with a custom legend and insights -->
       <div class="card glass-card border-0 shadow-sm">
@@ -62,9 +61,9 @@
         <h5 class="fw-bold">Spending by Category</h5>
         <br />
         <div class="row align-items-center">
-    <div class="col-md-7">
+      <div class="col-md-7">
         <canvas id="categoryChart"></canvas>
-    </div>
+      </div>
     <div class="col-md-5">
     <div id="custom-legend" class="mb-4">
         {% for category, amount in category_data.items() %}
@@ -139,24 +138,63 @@
 
 <!-- Spending Efficiency Card -->
 <!-- Displays spending efficiency status with a modal trigger -->
+<!-- The card changes color based on spend_ratio thresholds -->
 <div class="card border-0 p-4 shadow text-white" 
      data-bs-toggle="modal" 
      data-bs-target="#efficiencyInfoModal"
-     style="border-radius: 24px; background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%); cursor: pointer; transition: transform 0.2s; box-shadow: 0 10px 20px -10px rgba(79, 172, 254, 0.5) !important;"
+     style="border-radius: 24px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            background: {% if spend_ratio < 50 %}linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%)
+                        {% elif spend_ratio < 85 %}linear-gradient(135deg, #f6d365 0%, #fda085 100%)
+                        {% else %}linear-gradient(135deg, #ff0844 0%, #ffb199 100%){% endif %};
+            box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.2) !important;"
      onmouseover="this.style.transform='translateY(-5px)'"
      onmouseout="this.style.transform='translateY(0)'">
+    
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <small class="text-white d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem;">Efficiency</small>
+            <small class="text-white d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.9rem; opacity: 3.9;">Efficiency</small>
             <h3 class="fw-bold mb-0">
                 {% if spend_ratio < 50 %} Optimized
                 {% elif spend_ratio < 85 %} Moderate
                 {% else %} Critical {% endif %}
             </h3>
+            <small class="d-block mt-2" style="font-size: 0.75rem; opacity: 1;">
+                {{ "{:,.1f}".format(spend_ratio) }}% of budget used
+            </small>
         </div>
         <div class="rounded-circle p-3" style="background: rgba(255, 255, 255, 0.2);">
-            <i class="bi bi-lightning-charge fs-4"></i>
+            <i class="bi {% if spend_ratio < 85 %}bi-lightning-charge{% else %}bi-exclamation-octagon{% endif %} fs-4"></i>
         </div>
+    </div>
+</div>
+
+<div class="card border-0 p-4 shadow-sm mt-4" 
+     data-bs-toggle="modal" 
+     data-bs-target="#dailyLimitInfoModal"
+     style="border-radius: 24px; background: #ffffff; border: 1px solid #e3e6f0 !important; cursor: pointer; transition: all 0.2s ease;">
+    
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <small class="text-muted d-block fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.75rem;">Daily Safe Limit</small>
+            <h3 class="fw-bold mb-0 text-dark">UGX {{ "{:,.0f}".format(daily_limit) }}</h3>
+        </div>
+        <div class="rounded-circle p-2 bg-light text-primary">
+            <i class="bi bi-calendar-check fs-5"></i>
+        </div>
+    </div>
+    
+    <div class="p-3 rounded-4" style="background-color: #f8f9fc;">
+        <div class="d-flex justify-content-between mb-2">
+            <small class="text-muted">Target Status:</small>
+            <span class="badge rounded-pill px-2 {% if spend_ratio < 85 %}bg-success{% else %}bg-danger{% endif %}" style="font-size: 0.7rem; color: white;">
+                Optimized
+            </span>
+        </div>
+        <p class="small mb-0 text-muted">
+            To reach the end of the month safely, try not to exceed this amount today.
+        </p>
     </div>
 </div>
     </div>
@@ -416,6 +454,46 @@ document.querySelectorAll('#custom-legend .badge').forEach((badge, i) => {
             </div>
         </div>
     </div>
+</div>
+
+<!-- Daily Limit Info Modal -->
+<!-- Explains how the Daily Safe Limit is calculated -->
+<div class="modal fade" id="dailyLimitInfoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 30px;">
+      <div class="modal-header border-0 p-4 pb-0">
+        <h5 class="fw-bold mb-0">Daily Limit Logic</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+            <div class="rounded-circle d-inline-flex p-3 mb-2" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd">
+                <i class="bi bi-calculator fs-1"></i>
+            </div>
+            <p class="text-muted small">This is your "Safe Zone." Spending within this limit ensures you don't hit a zero balance before next month.</p>
+        </div>
+
+        <div class="bg-light p-3 rounded-4 mb-3">
+          <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.65rem">The Formula</small>
+          <p class="mb-2 small">Available Cash ÷ Days Remaining in Month</p>
+          <div class="d-flex justify-content-between align-items-center bg-white p-2 rounded border shadow-sm">
+            <span class="small text-muted">UGX {{ "{:,.0f}".format(total_balance) }}</span>
+            <span class="text-muted">÷</span>
+            <span class="small text-dark fw-bold">{{ days_remaining }} Days</span> 
+            <span class="fw-bold text-primary">= UGX {{ "{:,.0f}".format(daily_limit) }}</span>
+          </div>
+        </div>
+        
+        <div class="p-3 rounded-4" style="background: #eef2ff; border-left: 4px solid #0d6efd;">
+            <small class="fw-bold d-block mb-1 text-primary">Pro Tip</small>
+            <p class="small mb-0 text-dark">If you spend <strong>less</strong> than this today, your Daily Limit for tomorrow will actually <strong>increase</strong>!</p>
+        </div>
+      </div>
+      <div class="modal-footer border-0 p-4 pt-0">
+        <button type="button" class="btn btn-primary w-100 py-3 rounded-4 fw-bold shadow-sm" data-bs-dismiss="modal">Got it!</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
