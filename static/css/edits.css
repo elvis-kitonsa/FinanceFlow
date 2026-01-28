@@ -371,3 +371,20 @@ Note: Applied specifically to the "Add Expense" button in the expense modal
 .detail-item:last-child {
   border-bottom: none;
 }
+
+/* Styling applied to the pop-up Avg. Daily Burn card button (Got it! Thanks) in the Analytics page
+   to make it purple in color and hoverable with a darker shade */
+button.btn-got-it {
+  background-color: #800080 !important;
+  border: none !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+  display: block;
+  width: 100%;
+}
+
+button.btn-got-it:hover {
+  background-color: #5d005d !important;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
