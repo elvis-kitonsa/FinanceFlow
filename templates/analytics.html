@@ -473,16 +473,29 @@ document.querySelectorAll('#custom-legend .badge').forEach((badge, i) => {
             <p class="text-muted small">This is your "Safe Zone." Spending within this limit ensures you don't hit a zero balance before next month.</p>
         </div>
 
-        <div class="bg-light p-3 rounded-4 mb-3">
-          <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.65rem">The Formula</small>
-          <p class="mb-2 small">Available Cash ÷ Days Remaining in Month</p>
-          <div class="d-flex justify-content-between align-items-center bg-white p-2 rounded border shadow-sm">
-            <span class="small text-muted">UGX {{ "{:,.0f}".format(total_balance) }}</span>
-            <span class="text-muted">÷</span>
-            <span class="small text-dark fw-bold">{{ days_remaining }} Days</span> 
-            <span class="fw-bold text-primary">= UGX {{ "{:,.0f}".format(daily_limit) }}</span>
-          </div>
+        <div class="bg-light p-4 rounded-4 mb-3 border">
+    <small class="text-muted d-block mb-3 text-uppercase fw-bold text-center" style="font-size: 0.7rem; letter-spacing: 1px;">Calculation Breakdown</small>
+    <div class="row align-items-center g-0 text-center">
+        <div class="col">
+            <span class="d-block small text-muted">Balance</span>
+            <span class="fw-bold text-dark">UGX {{ "{:,.0f}".format(total_balance) }}</span>
         </div>
+        <div class="col-auto">
+            <i class="bi bi-divide text-muted fs-4"></i>
+        </div>
+        <div class="col">
+            <span class="d-block small text-muted">Days Left</span>
+            <span class="fw-bold text-dark">{{ days_remaining }} Days</span>
+        </div>
+        <div class="col-auto">
+            <i class="bi bi-pause-fill rotate-90 text-muted fs-4" style="transform: rotate(90deg);"></i>
+        </div>
+        <div class="col">
+            <span class="d-block small text-muted">Daily Limit</span>
+            <span class="fw-bold text-primary">UGX {{ "{:,.0f}".format(daily_limit) }}</span>
+        </div>
+    </div>
+</div>
         
         <div class="p-3 rounded-4" style="background: #eef2ff; border-left: 4px solid #0d6efd;">
             <small class="fw-bold d-block mb-1 text-primary">Pro Tip</small>
