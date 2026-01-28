@@ -495,7 +495,7 @@ def analytics():
                            days_left=int(days_left), # Will now show 1 Day
                            savings_ratio=savings_ratio, 
                            spend_ratio=spend_ratio,
-                           days_remaining=days_remaining,
+                           days_remaining=days_remaining, # For daily limit display (Used to indicate how many days are left in the month)
                            daily_limit=daily_limit,
                            category_data=dict(category_data),
                            total_balance=effective_balance)
