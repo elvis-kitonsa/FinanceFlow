@@ -1,3 +1,6 @@
+import requests
+import calendar
+
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from extensions import db 
 from datetime import datetime, date
@@ -6,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import extract
 from datetime import datetime, timedelta
 from collections import defaultdict
-import requests
+
 
 
 
@@ -34,7 +37,7 @@ from models import User, Expense, Budget
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 # --- AUTHENTICATION ROUTES ---
 
@@ -94,7 +97,6 @@ def login():
         # 1. Get the specific fields from your modern toggle form
         email_val = request.form.get('email')
         password = request.form.get('password')
-        
         user = None
 
         # 2. Logic: Use email address to find user
@@ -105,10 +107,22 @@ def login():
 
         # 3. Security Check
         if user and check_password_hash(user.password_hash, password):
+
+            # --- NEW: Reactivation Logic ---
+            # Allows a user that deactivated their account to be able to to get it back
+            if hasattr(user, 'status') and user.status == "Deactivated":
+                user.status = "Active"
+                try:
+                    db.session.commit()
+                    flash("Welcome back! Your account has been reactivated.", "success")
+                except Exception:
+                    db.session.rollback()
+            # -------------------------------
+
             login_user(user)
-            
-            #flash(f'Welcome back!', 'success')
             return redirect(url_for('dashboard'))
+        
+            #flash(f'Welcome back!', 'success')
         
         flash('No account found or invalid credentials.', 'danger')
         
@@ -407,13 +421,19 @@ def analytics():
                                initials=initials,
                                current_day=current_day,
                                current_date=current_date,
+                               expenses=[], # Keep as empty list
                                daily_data={},
-                               category_data={}, # Added here 
+                               category_data={'No Data': 0}, # Add a placeholder 
                                total_spent=0, 
                                avg_burn=0, 
                                projected_date="N/A", 
                                days_left=0, 
-                               total_balance=current_user.total_balance)
+                               savings_ratio=100, # Added: 100% of budget is "saved" if nothing is spent
+                               spend_ratio=0,     # Added: 0% spent
+                               days_remaining=max(1, calendar.monthrange(now.year, now.month)[1] - now.day),
+                               daily_limit=current_user.total_balance / max(1, calendar.monthrange(now.year, now.month)[1] - now.day),
+                               total_budget=current_user.total_balance,
+                               total_remaining=current_user.total_balance)
 
     # 3. Process Transactions for the Cumulative Burn Graph
     daily_data = defaultdict(float)
@@ -456,7 +476,6 @@ def analytics():
     effective_balance = current_user.total_balance - (total_spent_so_far + total_saved_so_far)
 
     # --- ADD THIS NEW LOGIC HERE ---
-    import calendar
     days_in_month = calendar.monthrange(now.year, now.month)[1]
     days_remaining = max(1, days_in_month - now.day) 
     daily_limit = effective_balance / days_remaining
@@ -502,7 +521,7 @@ def analytics():
                            total_budget=current_user.total_balance, # stays fixed at the set amount - 2.5M
                            total_remaining=effective_balance) # actual balance with some expenses added
 
-# PRINT RECEIPT ROUTE
+# PRINT RECEIPT ROUTE - Used in the accounts.html section
 # Generates printable expense reports based on user selection
 @app.route('/print_receipt')
 @login_required
@@ -536,6 +555,102 @@ def print_receipt():
                            total_spent=total_spent,
                            total_balance=current_user.total_balance)
 
+# USER PROFILE ROUTE
+# Displays the user's profile page with editable and non-editable fields
+@app.route('/profile')
+@login_required
+def profile():
+    user = current_user
+    now = datetime.now() 
+
+    # 1. Initials Logic (Safe check for KE initials)
+    # This keeps your top-right avatar style consistent
+    names = user.full_name.split() if user.full_name else []
+    initials = "".join([n[0].upper() for n in names[:2]]) if names else "??"
+
+    # 2. Safe Data Fetching
+    # We use 'getattr' to provide a fallback value if the column is missing in DB
+    total_budget = getattr(user, 'total_budget', 2500000) 
+    
+    # Check if 'created_at' exists, otherwise use a default string
+    if hasattr(user, 'created_at') and user.created_at:
+        date_joined = user.created_at.strftime("%B %d, %Y")
+    else:
+        date_joined = "January 2026"
+
+    # 3. DOB Fetching (Safe)
+    dob_value = getattr(user, 'dob', 'Not Provided')
+
+    return render_template('profile.html', 
+                           full_name=user.full_name,
+                           username=user.username,
+                           email=user.email,
+                           dob=getattr(user, 'dob', '2000-08-10'),
+                           date_joined=date_joined,
+                           total_budget=total_budget,
+                           user_initials=initials,
+                           day_name=now.strftime("%A"),
+                           current_date=now.strftime("%b %d, %Y"))
+
+# UPDATE PROFILE ROUTE
+# When accessed, this route will display a form to update the user's profile
+# The form will be pre-filled with the current user's information
+@app.route('/profile/update', methods=['POST'])
+@login_required
+def update_profile():
+    user = current_user
+    new_username = request.form.get('username')
+    new_email = request.form.get('email')
+    
+    # 1. Validation for empty fields
+    if not new_username or not new_email:
+        flash("Username and Email cannot be empty.", "danger")
+        return redirect(url_for('profile'))
+        
+    # 2. Check if the data is actually different from what is already saved
+    if new_username == user.username and new_email == user.email:
+        flash("No changes were made.", "info")
+        return redirect(url_for('profile'))
+    
+    # 3. Apply changes only if they are new
+    user.username = new_username
+    user.email = new_email
+    
+    # 4. Commit with Error Handling
+    try:
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Error: Username or email is already in use by another account.", "danger")
+    
+    return redirect(url_for('profile'))
+
+# DEACTIVATE ACCOUNT ROUTE
+# This logic will flip the status and log the user out immediately.
+@app.route('/profile/deactivate', methods=['POST'])
+@login_required
+def deactivate_account():
+    user = current_user
+    
+    # Optional: You could set user.is_active = False here if your model supports it
+    # For now, we will perform a safe deletion or status update
+    try:
+        # If you want to completely remove them:
+        # db.session.delete(user) 
+        
+        # Recommendation: Just flag them as inactive
+        user.status = "Deactivated" 
+        db.session.commit()
+        
+        logout_user() # Import this from flask_login
+        flash("Your account has been deactivated. We're sorry to see you go.", "info")
+        return redirect(url_for('login'))
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred during deactivation.", "danger")
+        return redirect(url_for('profile'))
+    
 # --- DATABASE INITIALIZATION ---
 
 with app.app_context():

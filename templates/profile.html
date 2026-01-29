@@ -1,0 +1,369 @@
+{% extends "base.html" %} {% block content %}
+<style>
+  :root {
+    --fms-blue: #0000ff;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Main Container with subtle gradient to tie it all together */
+  .profile-viewport {
+    background: linear-gradient(135deg, #f4f7fe 0%, #eef2ff 100%);
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .elite-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 255, 0.08);
+    overflow: hidden;
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    min-height: 550px;
+  }
+
+  /* Left Side: Branding & Identity */
+  .profile-sidebar {
+    background: var(--fms-blue);
+    width: 35%;
+    padding: 40px 30px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  .sidebar-circle-deco {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+
+  .profile-avatar-elite {
+    width: 100px;
+    height: 100px;
+    background: white;
+    color: var(--fms-blue);
+    border-radius: 35px; /* Modern squircles look more premium */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    font-weight: 800;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px;
+  }
+
+  /* Right Side: Interactive Forms */
+  /* Added: Set the main panel to a very light off-white to make the white boxes 'pop' */
+  .profile-main-content {
+    flex: 1;
+    padding: 35px 45px;
+    background: #f9fbff;
+  }
+
+  .mb-5 {
+    margin-bottom: 2rem !important; /* Shrink space after 'User Profile Settings' */
+  }
+
+  /* Update: Added a visible border and changed background to pop against the white panel */
+  .fms-input-box {
+    background: #ffffff; /* Pure white looks better on the soft gray background we'll add */
+    border: 1.5px solid #e0e6ed; /* Distinct border for visibility */
+    border-radius: 18px;
+    padding: 10px 18px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02); /* Subtle depth */
+  }
+
+  .mt-5 {
+    margin-top: 2rem !important; /* Pull up the Security Zone */
+  }
+
+  /* Update: Enhanced focus state to match your 'Elite' branding */
+  .fms-input-box:focus-within {
+    border-color: var(--fms-blue);
+    background: white;
+    box-shadow: 0 10px 20px rgba(0, 0, 255, 0.08);
+  }
+
+  .fms-input-box label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #36454f;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  /* General styles for both inputs and read-only text */
+  .fms-input-box input,
+  .fms-input-box p {
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-weight: 700;
+    color: #1a1d1f;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    height: 30px; /* Gives the text room to breathe */
+    line-height: 30px;
+    font-size: 1rem;
+  }
+
+  /* Specific padding ONLY for the input with the 'X' button */
+  .fms-input-box input {
+    padding-right: 40px !important; /* Forces text to stop before hitting the X button */
+  }
+
+  .stat-pill {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .back-arrow-circle {
+    width: 32px;
+    height: 32px;
+    background: #f0f3ff;
+    color: var(--fms-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+  }
+
+  a:hover .back-arrow-circle {
+    background: var(--fms-blue);
+    color: white;
+    transform: translateX(-3px);
+  }
+
+  .tracking-wider {
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+  }
+
+  a:hover .tracking-wider {
+    color: var(--fms-blue) !important;
+  }
+
+  /* Update: Give the 'X' button a background color so it is visible */
+  .btn-clear {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f0f3ff; /* Light blue background makes it visible on white */
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--fms-blue); /* Branding color */
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 5;
+  }
+
+  /* Hover Effect for the Clear Username X button */
+  .btn-clear:hover {
+    background: var(--fms-blue); /* Matches your brand instead of red */
+    color: #ffffff;
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* Show the button when the input is focused or has text */
+  .fms-input-box:focus-within .btn-clear,
+  .fms-input-box:hover .btn-clear {
+    opacity: 1;
+  }
+
+  /* Styling for the Save Changes Button */
+  .btn-fms-primary {
+    background: var(--fms-blue);
+    color: white;
+    border: none;
+    border-radius: 15px; /* Rounded corners to match input boxes */
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-fms-primary:hover {
+    background: #0000cd; /* Slightly darker blue */
+    transform: translateY(-2px); /* Lift effect */
+    box-shadow: 0 10px 20px rgba(0, 0, 255, 0.2);
+    color: white;
+  }
+
+  .btn-fms-primary:active {
+    transform: translateY(0); /* Press effect */
+  }
+</style>
+
+<div class="profile-viewport">
+  <div class="elite-card">
+    <div class="profile-sidebar">
+      <div class="sidebar-circle-deco"></div>
+
+      <div>
+        <div class="profile-avatar-elite">{{ user_initials }}</div>
+        <h2 class="fw-extrabold mb-1">{{ full_name }}</h2>
+        <p class="small fw-bold">Verified Member Since {{ date_joined }}</p>
+      </div>
+
+      <div class="stat-pill">
+        <span class="d-block small opacity-75 fw-bold text-uppercase mb-1">Active Budget</span>
+        <h3 class="fw-bold mb-0">UGX {{ '{:,.0f}'.format(total_budget) }}</h3>
+      </div>
+    </div>
+
+    <div class="profile-main-content">
+      <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+          <a href="{{ url_for('dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2 mb-2 group">
+            <div class="back-arrow-circle">
+              <i class="bi bi-chevron-left"></i>
+            </div>
+            <span class="text-dark small fw-bold text-uppercase tracking-wider">Back to Dashboard</span> </a
+          ><br />
+          <h3 class="fw-extrabold text-dark mb-0" style="font-size: 1.2rem; text-transform: uppercase; font-weight: bold">User Profile Settings</h3>
+        </div>
+
+        <div class="text-end border-start ps-4">
+          <p class="text-dark small fw-bold mb-0">{{ day_name.upper() }}</p>
+          <p class="text-primary fw-bold mb-0">{{ current_date }}</p>
+        </div>
+      </div>
+
+      <form action="{{ url_for('update_profile') }}" method="POST">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="fms-input-box">
+              <label>Legal Full Name</label>
+              <p>{{ full_name }}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="fms-input-box">
+              <label>Date of Birth</label>
+              <p>{{ dob }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Username entry textbox with a clear button to support quick erasure -->
+        <div class="fms-input-box position-relative">
+          <label>Username</label>
+          <div class="d-flex align-items-center">
+            <input type="text" name="username" id="usernameInput" class="fms-value" value="{{ username }}" />
+            <button type="button" class="btn-clear shadow-sm js-clear-btn" data-target="usernameInput">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Email entry textbox with a clear button to support quick erasure -->
+        <div class="fms-input-box position-relative">
+          <label>Email Address</label>
+          <div class="d-flex align-items-center">
+            <input type="email" name="email" id="emailInput" class="fms-value" value="{{ email }}" />
+            <button type="button" class="btn-clear shadow-sm js-clear-btn" data-target="emailInput">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!--
+        <div class="fms-input-box mb-4">
+          <label>Email Address</label>
+          <input type="email" name="email" value="{{ email }}" />
+        </div>
+        -->
+
+        <div class="d-flex gap-3 mt-4">
+          <button type="submit" class="btn btn-fms-primary flex-grow-1 py-3 shadow-lg">Save Changes</button>
+        </div>
+      </form>
+
+      <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="fw-bold text-dark mb-0">Security Zone</h6>
+          <p class="text-muted small mb-0">Manage your privacy and account status.</p>
+        </div>
+
+        <!-- Deactivate button updated to allow trigger Deactivate Modal below -->
+        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#deactivateModal">Deactivate</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Javascript logic to support quick textual erasure in the Username textbox - Field Editing
+  // Covers text deletion for both the Username and Email Address text boxes in the Profile page
+  document.addEventListener("DOMContentLoaded", function () {
+    // Select all buttons with our new class
+    const clearButtons = document.querySelectorAll(".js-clear-btn");
+
+    clearButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        // Find the specific input this button is meant to clear
+        const targetId = this.getAttribute("data-target");
+        const inputField = document.getElementById(targetId);
+
+        if (inputField) {
+          inputField.value = ""; // Erase only the targeted content
+          inputField.focus(); // Keep focus for typing
+        }
+      });
+    });
+  });
+</script>
+
+<!-- Deactivate Account Modal -->
+<!-- This ensures that when a user clicks "Deactivate", they are met with a clear warning -->
+<div class="modal fade" id="deactivateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 25px">
+      <div class="modal-body p-5 text-center">
+        <div class="mb-4 text-danger" style="font-size: 4rem">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 class="fw-bold text-dark mb-3">Are you absolutely sure?</h3>
+        <p class="text-muted mb-4">Deactivating your account will restrict access to your FinanceFlow dashboard and budgets. This action is sensitive.</p>
+
+        <div class="d-grid gap-2">
+          <form action="{{ url_for('deactivate_account') }}" method="POST">
+            <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-4">Yes, Deactivate My Account</button>
+          </form>
+          <button type="button" class="btn btn-light w-100 py-3 fw-bold rounded-4" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
