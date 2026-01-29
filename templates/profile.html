@@ -115,6 +115,34 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
+
+  .back-arrow-circle {
+    width: 32px;
+    height: 32px;
+    background: #f0f3ff;
+    color: var(--fms-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+  }
+
+  a:hover .back-arrow-circle {
+    background: var(--fms-blue);
+    color: white;
+    transform: translateX(-3px);
+  }
+
+  .tracking-wider {
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+  }
+
+  a:hover .tracking-wider {
+    color: var(--fms-blue) !important;
+  }
 </style>
 
 <div class="profile-viewport">
@@ -123,9 +151,6 @@
       <div class="sidebar-circle-deco"></div>
 
       <div>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-light rounded-circle p-2 mb-5 shadow-sm">
-          <i class="bi bi-arrow-left text-primary fs-4"></i>
-        </a>
         <div class="profile-avatar-elite">{{ user_initials }}</div>
         <h2 class="fw-extrabold mb-1">{{ full_name }}</h2>
         <p class="opacity-75 small fw-bold">Verified Member Since {{ date_joined }}</p>
@@ -139,10 +164,19 @@
 
     <div class="profile-main-content">
       <div class="d-flex justify-content-between align-items-center mb-5">
-        <h4 class="fw-extrabold mb-0 text-dark">Account Settings</h4>
-        <div class="text-end">
-          <p class="text-muted small fw-bold mb-0">{{ day_name.upper() }}</p>
-          <p class="text-primary small fw-bold mb-0">{{ current_date }}</p>
+        <div>
+          <a href="{{ url_for('dashboard') }}" class="text-decoration-none d-flex align-items-center gap-2 mb-2 group">
+            <div class="back-arrow-circle">
+              <i class="bi bi-chevron-left"></i>
+            </div>
+            <span class="text-dark small fw-bold text-uppercase tracking-wider">Back to Dashboard</span>
+          </a>
+          <h3 class="fw-extrabold text-dark mb-0" style="font-size: 1.8rem">Account Settings</h3>
+        </div>
+
+        <div class="text-end border-start ps-4">
+          <p class="text-dark small fw-bold mb-0">{{ day_name.upper() }}</p>
+          <p class="text-primary fw-bold mb-0">{{ current_date }}</p>
         </div>
       </div>
 
@@ -174,8 +208,8 @@
 
         <div class="d-flex gap-3 mt-4">
           <button type="submit" class="btn btn-fms-primary flex-grow-1 py-3 shadow-lg">Save Changes</button>
-          <button type="button" class="btn btn-light px-4 rounded-4 fw-bold border">
-            <i class="bi bi-shield-lock"></i>
+          <button type="button" class="btn btn-light px-4 rounded-4 fw-bold border" title="Security Settings">
+            <i class="bi bi-shield-lock text-primary"></i>
           </button>
         </div>
       </form>
