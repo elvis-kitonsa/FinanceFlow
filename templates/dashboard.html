@@ -41,6 +41,71 @@
 </header>
 
 <main class="p-4">
+  <!-- If the user has logged in for the first time after registering, they will see this introductory card -->
+  <!-- Users can dismiss it and never see it again -->
+  <!-- But it is a must-see for first timers -->
+  {% if not current_user.has_seen_welcome %}
+  <div id="welcomeCard" class="card border-0 mb-4 overflow-hidden position-relative shadow-lg" style="border-radius: 24px; background: linear-gradient(135deg, #0d6efd 0%, #00d2ff 100%)">
+    <div class="position-absolute end-0 top-50 translate-middle-y opacity-10" style="margin-right: -2%; pointer-events: none; z-index: 1">
+      <i class="bi bi-shield-check" style="font-size: clamp(10rem, 20vw, 15rem); line-height: 1; padding-right: 20px"></i>
+    </div>
+
+    <div class="card-body p-4 p-md-5 position-relative" style="z-index: 2">
+      <div class="row align-items-center">
+        <div class="col-auto d-none d-lg-block">
+          <div class="d-flex align-items-center justify-content-center shadow-sm" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); width: 70px; height: 70px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.3)">
+            <i class="bi bi-stars text-white fs-2"></i>
+          </div>
+        </div>
+
+        <div class="col ps-lg-4">
+          <h3 class="fw-bold text-white mb-2">Maximize your FinanceFlow</h3>
+          <p class="text-white text-opacity-90 mb-4" style="max-width: 500px; font-size: 1rem">Your budget is synced to a <strong>monthly cycle</strong>. We've automated your limits to keep your capital healthy until the 1st.</p>
+
+          <div class="d-flex flex-wrap align-items-center gap-3">
+            <button onclick="handleWelcomeDismiss()" class="btn btn-white fw-bold px-4 py-2 rounded-pill shadow-sm">Explore Dashboard</button>
+            <div class="form-check form-switch bg-white bg-opacity-10 px-3 py-2 rounded-pill d-inline-flex align-items-center border border-white border-opacity-25">
+              <input class="form-check-input ms-0 me-2" type="checkbox" id="dontShowAgain" style="cursor: pointer" />
+              <label class="form-check-label text-white small" for="dontShowAgain" style="cursor: pointer">Don't show again</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-4 opacity-50" onclick="closeCardOnly()"></button>
+    </div>
+  </div>
+
+  <script>
+    // Logic to handle the permanent dismissal via the checkbox
+    function handleWelcomeDismiss() {
+      const isChecked = document.getElementById("dontShowAgain").checked;
+
+      if (isChecked) {
+        // Tell the backend to never show this again
+        fetch("/dismiss_welcome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              document.getElementById("welcomeCard").classList.add("d-none");
+            }
+          });
+      } else {
+        // Just hide it for this session if they didn't check the box
+        document.getElementById("welcomeCard").classList.add("d-none");
+      }
+    }
+
+    // Logic for the 'X' button - just hides it until next refresh
+    function closeCardOnly() {
+      document.getElementById("welcomeCard").classList.add("d-none");
+    }
+  </script>
+  {% endif %}
+
   <!-- Summary Cards Section -->
   <!-- Displays key financial metrics in a responsive grid layout -->
   <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-5">

@@ -141,6 +141,20 @@ def index():
         return redirect(url_for('dashboard'))
     return redirect(url_for('login'))
 
+# 6. DISMISS WELCOME CARD ROUTE
+# Flips the has_seen_welcome flag to True so the user never sees the intro again
+@app.route('/dismiss_welcome', methods=['POST'])
+@login_required
+def dismiss_welcome():
+    try:
+        # Update the current user's preference
+        current_user.has_seen_welcome = True
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Welcome card dismissed."})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 # --- MAIN DASHBOARD ROUTE ---
 @app.route('/dashboard')
 @login_required 
