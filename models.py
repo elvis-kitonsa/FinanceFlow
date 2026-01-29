@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     base_currency = db.Column(db.String(3), default='UGX')
     total_balance = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='Active') # This field supports activated and deactivated users to access their accounts
     
     # Relationships
     expenses = db.relationship('Expense', backref='owner', lazy=True)

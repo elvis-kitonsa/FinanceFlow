@@ -306,9 +306,6 @@
 
         <div class="d-flex gap-3 mt-4">
           <button type="submit" class="btn btn-fms-primary flex-grow-1 py-3 shadow-lg">Save Changes</button>
-          <button type="button" class="btn btn-light px-4 rounded-4 fw-bold border" title="Security Settings">
-            <i class="bi bi-shield-lock text-primary"></i>
-          </button>
         </div>
       </form>
 
@@ -317,7 +314,9 @@
           <h6 class="fw-bold text-dark mb-0">Security Zone</h6>
           <p class="text-muted small mb-0">Manage your privacy and account status.</p>
         </div>
-        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Deactivate</button>
+
+        <!-- Deactivate button updated to allow trigger Deactivate Modal below -->
+        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#deactivateModal">Deactivate</button>
       </div>
     </div>
   </div>
@@ -344,4 +343,27 @@
     });
   });
 </script>
+
+<!-- Deactivate Account Modal -->
+<!-- This ensures that when a user clicks "Deactivate", they are met with a clear warning -->
+<div class="modal fade" id="deactivateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 25px">
+      <div class="modal-body p-5 text-center">
+        <div class="mb-4 text-danger" style="font-size: 4rem">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <h3 class="fw-bold text-dark mb-3">Are you absolutely sure?</h3>
+        <p class="text-muted mb-4">Deactivating your account will restrict access to your FinanceFlow dashboard and budgets. This action is sensitive.</p>
+
+        <div class="d-grid gap-2">
+          <form action="{{ url_for('deactivate_account') }}" method="POST">
+            <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-4">Yes, Deactivate My Account</button>
+          </form>
+          <button type="button" class="btn btn-light w-100 py-3 fw-bold rounded-4" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

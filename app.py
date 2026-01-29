@@ -94,7 +94,6 @@ def login():
         # 1. Get the specific fields from your modern toggle form
         email_val = request.form.get('email')
         password = request.form.get('password')
-        
         user = None
 
         # 2. Logic: Use email address to find user
@@ -105,10 +104,22 @@ def login():
 
         # 3. Security Check
         if user and check_password_hash(user.password_hash, password):
+
+            # --- NEW: Reactivation Logic ---
+            # Allows a user that deactivated their account to be able to to get it back
+            if hasattr(user, 'status') and user.status == "Deactivated":
+                user.status = "Active"
+                try:
+                    db.session.commit()
+                    flash("Welcome back! Your account has been reactivated.", "success")
+                except Exception:
+                    db.session.rollback()
+            # -------------------------------
+
             login_user(user)
-            
-            #flash(f'Welcome back!', 'success')
             return redirect(url_for('dashboard'))
+        
+            #flash(f'Welcome back!', 'success')
         
         flash('No account found or invalid credentials.', 'danger')
         
@@ -607,6 +618,31 @@ def update_profile():
     
     return redirect(url_for('profile'))
 
+# DEACTIVATE ACCOUNT ROUTE
+# This logic will flip the status and log the user out immediately.
+@app.route('/profile/deactivate', methods=['POST'])
+@login_required
+def deactivate_account():
+    user = current_user
+    
+    # Optional: You could set user.is_active = False here if your model supports it
+    # For now, we will perform a safe deletion or status update
+    try:
+        # If you want to completely remove them:
+        # db.session.delete(user) 
+        
+        # Recommendation: Just flag them as inactive
+        user.status = "Deactivated" 
+        db.session.commit()
+        
+        logout_user() # Import this from flask_login
+        flash("Your account has been deactivated. We're sorry to see you go.", "info")
+        return redirect(url_for('login'))
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred during deactivation.", "danger")
+        return redirect(url_for('profile'))
+    
 # --- DATABASE INITIALIZATION ---
 
 with app.app_context():
