@@ -120,14 +120,3 @@ Contributions are welcome! If you'd like to improve the Currency Conversion logi
 
     Open a Pull Request.
 
-📸 App Preview
-
-<table border="0">
-  <tr>
-    <td><b align="center">Main Dashboard</b><br><img src="static/img/dashboard.png" width="400"></td>
-    <td><b align="center">Analytics & Burn Rate</b><br><img src="static/img/analytics.png" width="400"></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><b align="center">Account & Budget Allocation</b><br><img src="static/img/accounts.png" width="600"></td>
-  </tr>
-</table>
