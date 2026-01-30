@@ -521,11 +521,22 @@ def analytics():
             savings_ratio = 0
             spend_ratio = 0
 
-    # --- ADD THIS NEW LOGIC HERE ---
-        days_in_month = calendar.monthrange(now.year, now.month)[1]
-        days_remaining = max(1, days_in_month - now.day) 
+    # --- REPLACING THE PREVIOUS NEW LOGIC SECTION ---
+    # 1. Get total days in the current month
+    days_in_month = calendar.monthrange(now.year, now.month)[1]
+
+    # 2. Safety Check: Prevent ZeroDivisionError on the last day of the month
+    # If today is the 31st and the month has 31 days, (31 - 31) = 0.
+    # We use max(1, ...) to ensure there is always at least 1 day remaining for the calculation.
+    days_remaining = max(1, days_in_month - now.day) 
+
+    # 3. Final Daily Limit Calculation with explicit safety check
+    if days_remaining > 0:
         daily_limit = effective_balance / days_remaining
-        # -------------------------------
+    else:
+        # Fallback if days_remaining is somehow not caught by max()
+        daily_limit = effective_balance
+    # -----------------------------------------------
 
     return render_template('analytics.html', 
                            initials=initials,
