@@ -487,10 +487,18 @@ def analytics():
         # Calculate days since the very first expense record
         start_date = sorted_expenses[0].date_to_handle.date()
         today = datetime.utcnow().date()
-        days_elapsed = (today - start_date).days + 1 # +1 to avoid division by zero on day one
+        # Calculate days difference
+        delta_days = (today - start_date).days
         
-        # Avg Daily Burn = Total Outflow / Days Active
-        avg_daily_burn = cumulative_burn / days_elapsed
+        # FIX: Ensure days_elapsed is NEVER 0 or negative
+        # Use max(1, ...) to ensure we divide by at least 1 day
+        days_elapsed = max(1, delta_days + 1)
+        
+        # Avg Daily Burn calculation with safety check
+        if cumulative_burn > 0:
+            avg_daily_burn = cumulative_burn / days_elapsed
+        else:
+            avg_daily_burn = 0
     
         # 4. THE FIX: Calculate Real Remaining Cash
         # Matches Dashboard: Total Set - (Spent + Saved)
@@ -532,10 +540,11 @@ def analytics():
 
     # 3. Final Daily Limit Calculation with explicit safety check
     if days_remaining > 0:
-        daily_limit = effective_balance / days_remaining
+        # max(0, ...) ensures that if they are broke, the limit just shows 0, not a negative
+        daily_limit = max(0, effective_balance / days_remaining)
     else:
         # Fallback if days_remaining is somehow not caught by max()
-        daily_limit = effective_balance
+        daily_limit = max(0, effective_balance)
     # -----------------------------------------------
 
     return render_template('analytics.html', 
